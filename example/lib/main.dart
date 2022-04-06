@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_summernote/flutter_summernote.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -14,22 +16,22 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Demo Flutter Summernote'),
+      home: const MyHomePage(title: 'Demo Flutter Summernote'),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({required this.title});
-
   final String title;
+
+  const MyHomePage({Key? key, required this.title}) : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  GlobalKey<FlutterSummernoteState> _keyEditor = GlobalKey();
+  final GlobalKey<FlutterSummernoteState> _keyEditor = GlobalKey();
   String result = "";
 
   @override
@@ -40,11 +42,11 @@ class _MyHomePageState extends State<MyHomePage> {
         elevation: 0,
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.save),
+            icon: const Icon(Icons.save),
             onPressed: () async {
               final value = (await _keyEditor.currentState?.getText());
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                duration: Duration(seconds: 5),
+                duration: const Duration(seconds: 5),
                 content: Text(value ?? "-"),
               ));
             },
