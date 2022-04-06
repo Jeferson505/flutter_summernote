@@ -4,7 +4,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -31,19 +30,19 @@ class FlutterSummernote extends StatefulWidget {
   final bool showBottomToolbar;
   final Function(String)? returnContent;
 
-  FlutterSummernote(
-      {Key? key,
-      this.value,
-      this.height,
-      this.decoration,
-      this.widthImage: "100%",
-      this.hint,
-      this.customToolbar,
-      this.customPopover,
-      this.hasAttachment: false,
-      this.showBottomToolbar: true,
-      this.returnContent})
-      : super(key: key);
+  const FlutterSummernote({
+    Key? key,
+    this.value,
+    this.height,
+    this.decoration,
+    this.widthImage = "100%",
+    this.hint,
+    this.customToolbar,
+    this.customPopover,
+    this.hasAttachment = false,
+    this.showBottomToolbar = true,
+    this.returnContent,
+  }) : super(key: key);
 
   @override
   FlutterSummernoteState createState() => FlutterSummernoteState();
@@ -63,7 +62,7 @@ class FlutterSummernoteState extends State<FlutterSummernote> {
           request.uri.queryParameters['query'] == "getRawTeXHTML") {
       } else {}
     } catch (e) {
-      print('Exception in handleRequest: $e');
+      if (kDebugMode) print('Exception in handleRequest: $e');
     }
   }
 
@@ -89,8 +88,8 @@ class FlutterSummernoteState extends State<FlutterSummernote> {
       height: widget.height ?? MediaQuery.of(context).size.height,
       decoration: widget.decoration ??
           BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(4)),
-            border: Border.all(color: Color(0xffececec), width: 1),
+            borderRadius: const BorderRadius.all(Radius.circular(4)),
+            border: Border.all(color: const Color(0xffececec), width: 1),
           ),
       child: Column(
         children: <Widget>[
@@ -98,7 +97,7 @@ class FlutterSummernoteState extends State<FlutterSummernote> {
             child: WebView(
               key: _mapKey,
               onWebResourceError: (e) {
-                print("error ${e.description}");
+                if (kDebugMode) print("error ${e.description}");
               },
               onWebViewCreated: (webViewController) {
                 _controller = webViewController;
@@ -108,13 +107,14 @@ class FlutterSummernoteState extends State<FlutterSummernote> {
               },
               javascriptMode: JavascriptMode.unrestricted,
               gestureNavigationEnabled: true,
-              gestureRecognizers: [
+              gestureRecognizers: {
                 Factory(
-                    () => VerticalDragGestureRecognizer()..onUpdate = (_) {}),
-              ].toSet(),
-              javascriptChannels: <JavascriptChannel>[
+                  () => VerticalDragGestureRecognizer()..onUpdate = (_) {},
+                ),
+              },
+              javascriptChannels: <JavascriptChannel>{
                 getTextJavascriptChannel(context)
-              ].toSet(),
+              },
               onPageFinished: (String url) {
                 if (widget.hint != null) {
                   setHint(widget.hint);
@@ -147,11 +147,15 @@ class FlutterSummernoteState extends State<FlutterSummernote> {
         child: GestureDetector(
           onTap: () async {
             String data = await getText();
-            Clipboard.setData(new ClipboardData(text: data));
+            Clipboard.setData(ClipboardData(text: data));
           },
           child: Row(
-              children: <Widget>[Icon(Icons.content_copy), Text("Copy")],
-              mainAxisAlignment: MainAxisAlignment.center),
+            children: const [
+              Icon(Icons.content_copy),
+              Text("Copy"),
+            ],
+            mainAxisAlignment: MainAxisAlignment.center,
+          ),
         ),
       ),
       Expanded(
@@ -170,11 +174,15 @@ class FlutterSummernoteState extends State<FlutterSummernote> {
                 .replaceAll("\r", " ")
                 .replaceAll('\r\n', " ");
             String txt = "\$('.note-editable').append( '" + txtIsi + "');";
-            _controller!.evaluateJavascript(txt);
+            _controller!.runJavascriptReturningResult(txt);
           },
           child: Row(
-              children: <Widget>[Icon(Icons.content_paste), Text("Paste")],
-              mainAxisAlignment: MainAxisAlignment.center),
+            children: const [
+              Icon(Icons.content_paste),
+              Text("Paste"),
+            ],
+            mainAxisAlignment: MainAxisAlignment.center,
+          ),
         ),
       )
     ];
@@ -187,8 +195,12 @@ class FlutterSummernoteState extends State<FlutterSummernote> {
             child: GestureDetector(
               onTap: () => _attach(context),
               child: Row(
-                  children: <Widget>[Icon(Icons.attach_file), Text("Attach")],
-                  mainAxisAlignment: MainAxisAlignment.center),
+                children: const [
+                  Icon(Icons.attach_file),
+                  Text("Attach"),
+                ],
+                mainAxisAlignment: MainAxisAlignment.center,
+              ),
             ),
           ));
     }
@@ -217,7 +229,7 @@ class FlutterSummernoteState extends State<FlutterSummernote> {
   }
 
   Future<String> getText() async {
-    await _controller?.evaluateJavascript(
+    await _controller?.runJavascriptReturningResult(
         "setTimeout(function(){GetTextSummernote.postMessage(document.getElementsByClassName('note-editable')[0].innerHTML)}, 0);");
     return text;
   }
@@ -236,25 +248,28 @@ class FlutterSummernoteState extends State<FlutterSummernote> {
         "document.getElementsByClassName('note-editable')[0].innerHTML = '" +
             txtIsi +
             "';";
-    _controller!.evaluateJavascript(txt);
+    _controller!.runJavascriptReturningResult(txt);
   }
 
   setFullContainer() {
-    _controller!.evaluateJavascript(
+    _controller!.runJavascriptReturningResult(
         '\$("#summernote").summernote("fullscreen.toggle");');
   }
 
   setFocus() {
-    _controller!.evaluateJavascript("\$('#summernote').summernote('focus');");
+    _controller!
+        .runJavascriptReturningResult("\$('#summernote').summernote('focus');");
   }
 
   setEmpty() {
-    _controller!.evaluateJavascript("\$('#summernote').summernote('reset');");
+    _controller!
+        .runJavascriptReturningResult("\$('#summernote').summernote('reset');");
   }
 
   setHint(String? text) {
     String hint = '\$(".note-placeholder").html("$text");';
-    _controller!.evaluateJavascript("setTimeout(function(){$hint}, 0);");
+    _controller!
+        .runJavascriptReturningResult("setTimeout(function(){$hint}, 0);");
   }
 
   Widget widgetIcon(IconData icon, String title, {Function? onTap}) {
@@ -271,10 +286,11 @@ class FlutterSummernoteState extends State<FlutterSummernote> {
             padding: const EdgeInsets.only(left: 4),
             child: Text(
               title,
-              style: TextStyle(
-                  color: Colors.black54,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400),
+              style: const TextStyle(
+                color: Colors.black54,
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+              ),
             ),
           )
         ],
@@ -327,7 +343,7 @@ class FlutterSummernoteState extends State<FlutterSummernote> {
     ''';
   }
 
-  String _defaultPopover = """
+  final String _defaultPopover = """
     image: [
       ['image', ['resizeFull', 'resizeHalf', 'resizeQuarter', 'resizeNone']],
       ['float', ['floatLeft', 'floatRight', 'floatNone']],
@@ -349,7 +365,7 @@ class FlutterSummernoteState extends State<FlutterSummernote> {
     ]
 """;
 
-  String _defaultToolbar = """
+  final String _defaultToolbar = """
     [
       ['style', ['bold', 'italic', 'underline', 'clear']],
       ['font', ['strikethrough', 'superscript', 'subscript']],
@@ -367,9 +383,9 @@ class FlutterSummernoteState extends State<FlutterSummernote> {
         builder: (context) {
           return Column(children: <Widget>[
             ListTile(
-              leading: Icon(Icons.camera_alt),
-              title: Text("Camera"),
-              subtitle: Text("Attach image from camera"),
+              leading: const Icon(Icons.camera_alt),
+              title: const Text("Camera"),
+              subtitle: const Text("Attach image from camera"),
               onTap: () async {
                 Navigator.pop(context);
                 final image = await _getImage(true);
@@ -377,9 +393,9 @@ class FlutterSummernoteState extends State<FlutterSummernote> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.photo),
-              title: Text("Gallery"),
-              subtitle: Text("Attach image from gallery"),
+              leading: const Icon(Icons.photo),
+              title: const Text("Gallery"),
+              subtitle: const Text("Attach image from gallery"),
               onTap: () async {
                 Navigator.pop(context);
                 final image = await _getImage(false);
@@ -391,7 +407,7 @@ class FlutterSummernoteState extends State<FlutterSummernote> {
   }
 
   Future<File?> _getImage(bool fromCamera) async {
-    final picked = await _imagePicker.getImage(
+    final picked = await _imagePicker.pickImage(
         source: (fromCamera) ? ImageSource.camera : ImageSource.gallery);
     if (picked != null) {
       return File(picked.path);
@@ -408,6 +424,6 @@ class FlutterSummernoteState extends State<FlutterSummernote> {
         "${base64Encode(imageBytes)}\" data-filename=\"$filename\">";
 
     String txt = "\$('.note-editable').append( '" + base64Image + "');";
-    _controller!.evaluateJavascript(txt);
+    _controller!.runJavascriptReturningResult(txt);
   }
 }

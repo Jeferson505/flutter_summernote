@@ -1,3 +1,8 @@
+## [1.0.1] - 2022-04-06
+* Update example project base code
+* Update dependent libs
+* Update base code
+
 ## [1.0.0] - 2021-06-21
 * Support Null Safety
 
