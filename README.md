@@ -2,7 +2,11 @@
 
 Text Editor in Flutter for Android and iOS to help free write WYSIWYG HTML code based on Summernote 0.8.18 javascript wrapper.
 
-![demo example](https://github.com/chandrabezzo/flutter_summernote/blob/master/screenshoot/home.png) ![demo example](https://github.com/chandrabezzo/flutter_summernote/blob/master/screenshoot/attach.png)
+<center>
+<img src="./screenshoot/home.png" width="200" alt="Example Project" />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<img src="./screenshoot/attach.png" width="200" alt="Attach Image Example" />
+</center>
 
 # NOTICE
 > This package dependent to the [Official WebView Plugin](https://pub.dev/packages/webview_flutter). In this package can't add image, video, or another file using editor toolbar.
@@ -12,13 +16,17 @@ Text Editor in Flutter for Android and iOS to help free write WYSIWYG HTML code 
 
 ## Setup
 
-add ```flutter_summernote: ^latest``` as deppendecy to pubspec.yaml
+To use flutter_summernote dependency by this repository, add the following code to your pubspec.yaml
+```yaml
+    flutter_summernote:
+        git: https://github.com/Jeferson505/flutter_summernote.git
+```
 
 ### iOS
 
 Add the following keys to your Info.plist file, located in <project root>/ios/Runner/Info.plist:
 
-```
+```plist
     <key>io.flutter.embedded_views_preview</key>
     <true/>
 
@@ -32,24 +40,24 @@ Add the following keys to your Info.plist file, located in <project root>/ios/Ru
     <key>NSAppTransportSecurity</key>
     <dict>
         <key>NSAllowsArbitraryLoads</key>
-         <true/>
+        <true/>
     </dict>
 ```
 
 ### Usage
 
 1. import flutter html editor
-```
+```dart
     import 'package:flutter_summernote/flutter_summernote.dart';
 ```
 
 2. Create Global key from HTML Editor State
-```
+```dart
     GlobalKey<FlutterSummernoteState> _keyEditor = GlobalKey();
 ```
 
 3. Add HTML Editor to widget
-```
+```dart
     FlutterSummernote(
         hint: "Your text here...",
         key: _keyEditor
@@ -61,12 +69,13 @@ Add the following keys to your Info.plist file, located in <project root>/ios/Ru
             [
                 ['style', ['bold', 'italic', 'underline', 'clear']],
                 ['font', ['strikethrough', 'superscript', 'subscript']]
-            ]"""
+            ]
+        """
     )
 ```
 
 4. Get text from Html Editor
-```
+```dart
     final _etEditor = await keyEditor.currentState.getText();
 ```
 
