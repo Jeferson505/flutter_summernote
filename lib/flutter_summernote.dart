@@ -1,21 +1,22 @@
 library flutter_summernote;
 
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:path/path.dart';
+import 'package:flutter_summernote/src/editor_components/bottom_toolbar/bottom_toolbar.dart';
+import 'package:flutter_summernote/src/editor_functions/page_functions.dart';
+import 'package:flutter_summernote/src/style/default_decoration.dart';
+import 'package:flutter_summernote/src/webview/webview_callbacks.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:flutter_summernote/src/editor_functions/editor_functions.dart'
+    as lib_functions;
 
 /*
-* Created by: Chandra Abdul Fattah on 13 July 2020
+* Maintained by Jeferson Mota since 06 April 2022
+* Forked from: https://github.com/chandrabezzo/flutter_summernote
+*
+* Created by Chandra Abdul Fattah on 13 July 2020
 * Inspired from: https://github.com/xrb21/flutter-html-editor
-* link:
 * */
 
 class FlutterSummernote extends StatefulWidget {
@@ -49,36 +50,24 @@ class FlutterSummernote extends StatefulWidget {
 }
 
 class FlutterSummernoteState extends State<FlutterSummernote> {
-  WebViewController? _controller;
+  WebViewController? _webViewController;
   String text = "";
   late String _page;
   final Key _mapKey = UniqueKey();
-  final _imagePicker = ImagePicker();
-  late bool _hasAttachment;
 
-  void handleRequest(HttpRequest request) {
-    try {
-      if (request.method == 'GET' &&
-          request.uri.queryParameters['query'] == "getRawTeXHTML") {
-      } else {}
-    } catch (e) {
-      if (kDebugMode) print('Exception in handleRequest: $e');
-    }
+  void _setWebViewController(WebViewController webViewController) {
+    setState(() => _webViewController = webViewController);
   }
 
   @override
   void initState() {
     super.initState();
-
-    _page = _initPage(widget.customToolbar, widget.customPopover);
-    _hasAttachment = widget.hasAttachment;
+    _page = initPage(widget.customToolbar, widget.customPopover);
   }
 
   @override
   void dispose() {
-    if (_controller != null) {
-      _controller = null;
-    }
+    if (_webViewController != null) _webViewController = null;
     super.dispose();
   }
 
@@ -86,41 +75,24 @@ class FlutterSummernoteState extends State<FlutterSummernote> {
   Widget build(BuildContext context) {
     return Container(
       height: widget.height ?? MediaQuery.of(context).size.height,
-      decoration: widget.decoration ??
-          BoxDecoration(
-            borderRadius: const BorderRadius.all(Radius.circular(4)),
-            border: Border.all(color: const Color(0xffececec), width: 1),
-          ),
+      decoration: widget.decoration ?? defaultDecoration,
       child: Column(
-        children: <Widget>[
+        children: [
           Expanded(
             child: WebView(
               key: _mapKey,
-              onWebResourceError: (e) {
-                if (kDebugMode) print("error ${e.description}");
-              },
-              onWebViewCreated: (webViewController) {
-                _controller = webViewController;
-                final String contentBase64 =
-                    base64Encode(const Utf8Encoder().convert(_page));
-                _controller!.loadUrl('data:text/html;base64,$contentBase64');
-              },
+              onWebResourceError: onWebResourceError,
+              onWebViewCreated: (webViewController) => onWebViewCreated(
+                webViewController,
+                _setWebViewController,
+                _page,
+              ),
               javascriptMode: JavascriptMode.unrestricted,
               gestureNavigationEnabled: true,
-              gestureRecognizers: {
-                Factory(
-                  () => VerticalDragGestureRecognizer()..onUpdate = (_) {},
-                ),
-              },
-              javascriptChannels: <JavascriptChannel>{
-                getTextJavascriptChannel(context)
-              },
+              gestureRecognizers: gestureRecognizers,
+              javascriptChannels: {getTextJavascriptChannel(context)},
               onPageFinished: (String url) {
-                if (widget.hint != null) {
-                  setHint(widget.hint);
-                } else {
-                  setHint("");
-                }
+                setHint(widget.hint ?? "");
 
                 setFullContainer();
                 if (widget.value != null) {
@@ -129,301 +101,56 @@ class FlutterSummernoteState extends State<FlutterSummernote> {
               },
             ),
           ),
-          Visibility(
-            visible: widget.showBottomToolbar,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(children: _generateBottomToolbar(context)),
-            ),
-          )
+          widget.showBottomToolbar && _webViewController != null
+              ? BottomToolbar(
+                  webviewController: _webViewController!,
+                  hasAttachment: widget.hasAttachment,
+                  widthImage: widget.widthImage,
+                  copyText: _copyText,
+                )
+              : const SizedBox(),
         ],
       ),
     );
-  }
-
-  List<Widget> _generateBottomToolbar(BuildContext context) {
-    var _toolbar = [
-      Expanded(
-        child: GestureDetector(
-          onTap: () async {
-            String data = await getText();
-            Clipboard.setData(ClipboardData(text: data));
-          },
-          child: Row(
-            children: const [
-              Icon(Icons.content_copy),
-              Text("Copy"),
-            ],
-            mainAxisAlignment: MainAxisAlignment.center,
-          ),
-        ),
-      ),
-      Expanded(
-        child: GestureDetector(
-          onTap: () async {
-            ClipboardData data = await (Clipboard.getData(Clipboard.kTextPlain)
-                as FutureOr<ClipboardData>);
-
-            String txtIsi = data.text!
-                .replaceAll("'", '\\"')
-                .replaceAll('"', '\\"')
-                .replaceAll("[", "\\[")
-                .replaceAll("]", "\\]")
-                .replaceAll("\n", "<br/>")
-                .replaceAll("\n\n", "<br/>")
-                .replaceAll("\r", " ")
-                .replaceAll('\r\n', " ");
-            String txt = "\$('.note-editable').append( '" + txtIsi + "');";
-            _controller!.runJavascriptReturningResult(txt);
-          },
-          child: Row(
-            children: const [
-              Icon(Icons.content_paste),
-              Text("Paste"),
-            ],
-            mainAxisAlignment: MainAxisAlignment.center,
-          ),
-        ),
-      )
-    ];
-
-    if (_hasAttachment) {
-      //add attachment widget
-      _toolbar.insert(
-          0,
-          Expanded(
-            child: GestureDetector(
-              onTap: () => _attach(context),
-              child: Row(
-                children: const [
-                  Icon(Icons.attach_file),
-                  Text("Attach"),
-                ],
-                mainAxisAlignment: MainAxisAlignment.center,
-              ),
-            ),
-          ));
-    }
-
-    return _toolbar;
   }
 
   JavascriptChannel getTextJavascriptChannel(BuildContext context) {
     return JavascriptChannel(
-        name: 'GetTextSummernote',
-        onMessageReceived: (JavascriptMessage message) {
-          String isi = message.message;
-          if (isi.isEmpty ||
-              isi == "<p></p>" ||
-              isi == "<p><br></p>" ||
-              isi == "<p><br/></p>") {
-            isi = "";
-          }
-          setState(() {
-            text = isi;
-          });
-          if (widget.returnContent != null) {
-            widget.returnContent!(text);
-          }
-        });
-  }
+      name: 'GetTextSummernote',
+      onMessageReceived: (JavascriptMessage message) {
+        String isi = message.message;
+        if (isi.isEmpty ||
+            isi == "<p></p>" ||
+            isi == "<p><br></p>" ||
+            isi == "<p><br/></p>") {
+          isi = "";
+        }
 
-  Future<String> getText() async {
-    await _controller?.runJavascriptReturningResult(
-        "setTimeout(function(){GetTextSummernote.postMessage(document.getElementsByClassName('note-editable')[0].innerHTML)}, 0);");
-    return text;
-  }
+        setState(() => text = isi);
 
-  setText(String v) async {
-    String txtIsi = v
-        .replaceAll("'", '\\"')
-        .replaceAll('"', '\\"')
-        .replaceAll("[", "\\[")
-        .replaceAll("]", "\\]")
-        .replaceAll("\n", "<br/>")
-        .replaceAll("\n\n", "<br/>")
-        .replaceAll("\r", " ")
-        .replaceAll('\r\n', " ");
-    String txt =
-        "document.getElementsByClassName('note-editable')[0].innerHTML = '" +
-            txtIsi +
-            "';";
-    _controller!.runJavascriptReturningResult(txt);
-  }
-
-  setFullContainer() {
-    _controller!.runJavascriptReturningResult(
-        '\$("#summernote").summernote("fullscreen.toggle");');
-  }
-
-  setFocus() {
-    _controller!
-        .runJavascriptReturningResult("\$('#summernote').summernote('focus');");
-  }
-
-  setEmpty() {
-    _controller!
-        .runJavascriptReturningResult("\$('#summernote').summernote('reset');");
-  }
-
-  setHint(String? text) {
-    String hint = '\$(".note-placeholder").html("$text");';
-    _controller!
-        .runJavascriptReturningResult("setTimeout(function(){$hint}, 0);");
-  }
-
-  Widget widgetIcon(IconData icon, String title, {Function? onTap}) {
-    return InkWell(
-      onTap: onTap as void Function()?,
-      child: Row(
-        children: <Widget>[
-          Icon(
-            icon,
-            color: Colors.black38,
-            size: 20,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 4),
-            child: Text(
-              title,
-              style: const TextStyle(
-                color: Colors.black54,
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-          )
-        ],
-      ),
+        if (widget.returnContent != null) {
+          widget.returnContent!(text);
+        }
+      },
     );
   }
 
-  String _initPage(String? customToolbar, String? customPopover) {
-    String toolbar;
-    if (customToolbar == null) {
-      toolbar = _defaultToolbar;
-    } else {
-      toolbar = customToolbar;
-    }
-    String popover;
-    if (customPopover == null) {
-      popover = _defaultPopover;
-    } else {
-      popover = customPopover;
-    }
-
-    return '''
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Summernote</title>
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-
-    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
-    </head>
-    <body>
-    <div id="summernote" contenteditable="true"></div>
-    <script type="text/javascript">
-      \$("#summernote").summernote({
-        placeholder: 'Your text here...',
-        tabsize: 2,
-        toolbar: $toolbar,
-        popover: {$popover}
-      });
-    </script>
-    </body>
-    </html>
-    ''';
+  void _copyText() {
+    getText().then((value) => Clipboard.setData(ClipboardData(text: value)));
   }
 
-  final String _defaultPopover = """
-    image: [
-      ['image', ['resizeFull', 'resizeHalf', 'resizeQuarter', 'resizeNone']],
-      ['float', ['floatLeft', 'floatRight', 'floatNone']],
-      ['remove', ['removeMedia']]
-    ],
-    link: [
-      ['link', ['linkDialogShow', 'unlink']]
-    ],
-    table: [
-      ['add', ['addRowDown', 'addRowUp', 'addColLeft', 'addColRight']],
-      ['delete', ['deleteRow', 'deleteCol', 'deleteTable']],
-    ],
-    air: [
-      ['color', ['color']],
-      ['font', ['bold', 'underline', 'clear']],
-      ['para', ['ul', 'paragraph']],
-      ['table', ['table']],
-      ['insert', ['link', 'picture']]
-    ]
-""";
+  Future<String> getText() {
+    String jsExpression =
+        "setTimeout(function(){GetTextSummernote.postMessage(document.getElementsByClassName('note-editable')[0].innerHTML)}, 0);";
+    _webViewController?.goForward();
+    _webViewController?.runJavascript(jsExpression);
 
-  final String _defaultToolbar = """
-    [
-      ['style', ['bold', 'italic', 'underline', 'clear']],
-      ['font', ['strikethrough', 'superscript', 'subscript']],
-      ['font', ['fontsize', 'fontname']],
-      ['color', ['forecolor', 'backcolor']],
-      ['para', ['ul', 'ol', 'paragraph']],
-      ['height', ['height']],
-      ['view', ['fullscreen']]
-    ]
-  """;
-
-  void _attach(BuildContext context) {
-    showModalBottomSheet(
-        context: context,
-        builder: (context) {
-          return Column(children: <Widget>[
-            ListTile(
-              leading: const Icon(Icons.camera_alt),
-              title: const Text("Camera"),
-              subtitle: const Text("Attach image from camera"),
-              onTap: () async {
-                Navigator.pop(context);
-                final image = await _getImage(true);
-                if (image != null) _addImage(image);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.photo),
-              title: const Text("Gallery"),
-              subtitle: const Text("Attach image from gallery"),
-              onTap: () async {
-                Navigator.pop(context);
-                final image = await _getImage(false);
-                if (image != null) _addImage(image);
-              },
-            ),
-          ], mainAxisSize: MainAxisSize.min);
-        });
+    return Future.delayed(const Duration(milliseconds: 100)).then((_) => text);
   }
 
-  Future<File?> _getImage(bool fromCamera) async {
-    final picked = await _imagePicker.pickImage(
-        source: (fromCamera) ? ImageSource.camera : ImageSource.gallery);
-    if (picked != null) {
-      return File(picked.path);
-    } else {
-      return null;
-    }
-  }
-
-  void _addImage(File image) async {
-    String filename = basename(image.path);
-    List<int> imageBytes = await image.readAsBytes();
-    String base64Image =
-        "<img width=\"${widget.widthImage}\" src=\"data:image/png;base64, "
-        "${base64Encode(imageBytes)}\" data-filename=\"$filename\">";
-
-    String txt = "\$('.note-editable').append( '" + base64Image + "');";
-    _controller!.runJavascriptReturningResult(txt);
-  }
+  void setText(String text) => lib_functions.setText(_webViewController, text);
+  void setHint(String hint) => lib_functions.setHint(_webViewController, hint);
+  void setFullContainer() => lib_functions.setFullContainer(_webViewController);
+  void setFocus() => lib_functions.setFocus(_webViewController);
+  void setEmpty() => lib_functions.setEmpty(_webViewController);
 }
