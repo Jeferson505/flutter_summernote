@@ -4,7 +4,6 @@ Text Editor in Flutter for Android and iOS to help free write WYSIWYG HTML code 
 
 <center>
 <img src="./screenshoot/home.png" width="200" alt="Example Project" />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <img src="./screenshoot/attach.png" width="200" alt="Attach Image Example" />
 </center>
 
@@ -27,21 +26,21 @@ To use flutter_summernote dependency by this repository, add the following code 
 Add the following keys to your Info.plist file, located in <project root>/ios/Runner/Info.plist:
 
 ```plist
-    <key>io.flutter.embedded_views_preview</key>
+<key>io.flutter.embedded_views_preview</key>
+<true/>
+
+<key>NSCameraUsageDescription</key>
+<string>Used to demonstrate image picker plugin</string>
+<key>NSMicrophoneUsageDescription</key>
+<string>Used to capture audio for image picker plugin</string>
+<key>NSPhotoLibraryUsageDescription</key>
+<string>Used to demonstrate image picker plugin</string>
+
+<key>NSAppTransportSecurity</key>
+<dict>
+    <key>NSAllowsArbitraryLoads</key>
     <true/>
-
-    <key>NSCameraUsageDescription</key>
-    <string>Used to demonstrate image picker plugin</string>
-    <key>NSMicrophoneUsageDescription</key>
-    <string>Used to capture audio for image picker plugin</string>
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>Used to demonstrate image picker plugin</string>
-
-    <key>NSAppTransportSecurity</key>
-    <dict>
-        <key>NSAllowsArbitraryLoads</key>
-        <true/>
-    </dict>
+</dict>
 ```
 
 ### Usage
