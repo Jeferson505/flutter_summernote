@@ -2,8 +2,7 @@
 
 Text Editor in Flutter for Android and iOS to help free write WYSIWYG HTML code based on Summernote 0.8.18 javascript wrapper.
 
-<img src="./screenshoot/home.png" width="200" alt="Example Project" style="text-align:center" />
-<img src="./screenshoot/attach.png" width="200" alt="Attach Image Example" style="text-align:center" />
+<img src="./screenshoot/home.png" width="250" alt="Example Project" /> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <img src="./screenshoot/attach.png" width="250" alt="Attach Image Example" />
 
 # NOTICE
 > This package dependent to the [Official WebView Plugin](https://pub.dev/packages/webview_flutter). In this package can't add image, video, or another file using editor toolbar.
