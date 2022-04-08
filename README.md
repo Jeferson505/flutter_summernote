@@ -2,10 +2,8 @@
 
 Text Editor in Flutter for Android and iOS to help free write WYSIWYG HTML code based on Summernote 0.8.18 javascript wrapper.
 
-<center>
-<img src="./screenshoot/home.png" width="200" alt="Example Project" />
-<img src="./screenshoot/attach.png" width="200" alt="Attach Image Example" />
-</center>
+<img src="./screenshoot/home.png" width="200" alt="Example Project" style="text-align:center" />
+<img src="./screenshoot/attach.png" width="200" alt="Attach Image Example" style="text-align:center" />
 
 # NOTICE
 > This package dependent to the [Official WebView Plugin](https://pub.dev/packages/webview_flutter). In this package can't add image, video, or another file using editor toolbar.
@@ -25,22 +23,22 @@ To use flutter_summernote dependency by this repository, add the following code 
 
 Add the following keys to your Info.plist file, located in <project root>/ios/Runner/Info.plist:
 
-```plist
-<key>io.flutter.embedded_views_preview</key>
-<true/>
-
-<key>NSCameraUsageDescription</key>
-<string>Used to demonstrate image picker plugin</string>
-<key>NSMicrophoneUsageDescription</key>
-<string>Used to capture audio for image picker plugin</string>
-<key>NSPhotoLibraryUsageDescription</key>
-<string>Used to demonstrate image picker plugin</string>
-
-<key>NSAppTransportSecurity</key>
-<dict>
-    <key>NSAllowsArbitraryLoads</key>
+```xml
+    <key>io.flutter.embedded_views_preview</key>
     <true/>
-</dict>
+
+    <key>NSCameraUsageDescription</key>
+    <string>Used to demonstrate image picker plugin</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Used to capture audio for image picker plugin</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Used to demonstrate image picker plugin</string>
+
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsArbitraryLoads</key>
+        <true/>
+    </dict>
 ```
 
 ### Usage
