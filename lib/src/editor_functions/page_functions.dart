@@ -1,5 +1,10 @@
+import 'package:flutter_summernote/src/editor_components/css/bootstrap_css.dart';
+import 'package:flutter_summernote/src/editor_components/css/summernote_css.dart';
 import 'package:flutter_summernote/src/editor_components/default_popover.dart';
 import 'package:flutter_summernote/src/editor_components/default_toolbar.dart';
+import 'package:flutter_summernote/src/editor_components/js/bootstrap_js.dart';
+import 'package:flutter_summernote/src/editor_components/js/jquery_js.dart';
+import 'package:flutter_summernote/src/editor_components/js/summernote_js.dart';
 
 String initPage(String? customToolbar, String? customPopover) {
   String toolbar = customToolbar ?? defaultToolbar;
@@ -8,30 +13,30 @@ String initPage(String? customToolbar, String? customPopover) {
   return '''
     <!DOCTYPE html>
     <html lang="pt-BR">
-    <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Summernote</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+      <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.min.js"></script>
-
-    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs4.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs4.min.js"></script>
-    </head>
-    <body>
-    <div id="summernote" contenteditable="true"></div>
-    <script type="text/javascript">
-      \$("#summernote").summernote({
-        placeholder: 'Your text here...',
-        tabsize: 2,
-        toolbar: $toolbar,
-        popover: {$popover}
-      });
-    </script>
-    </body>
+        <title>Summernote</title>
+        <style type="text/css">$bootstrapCSS</style>
+        <style type="text/css">$summernoteCSS</style>
+        <script type="text/javascript">$jQueryJS</script>
+        <script type="text/javascript">$bootstrapJS</script>
+        <script type="text/javascript">$summernoteJS</script>
+      </head>
+      <body>
+        <div id="summernote" contenteditable="true"></div>
+        <script type="text/javascript">
+          \$("#summernote").summernote({
+            lang: 'pt-BR',
+            tabsize: 2,
+            placeholder: 'Your text here...',
+            toolbar: $toolbar,
+            popover: {$popover},
+          });
+        </script>
+      </body>
     </html>
     ''';
 }

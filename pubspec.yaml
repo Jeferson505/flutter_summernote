@@ -1,7 +1,7 @@
 name: flutter_summernote
 description: Text Editor in Flutter for Android and iOS to help free write
   WYSIWYG HTML code based on Summernote 0.8.18 javascript wrapper.
-version: 1.0.1
+version: 2.0.0
 homepage: https://github.com/Jeferson505/flutter_summernote
 
 # The following defines the version and build number for your application.
