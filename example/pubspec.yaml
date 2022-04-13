@@ -50,19 +50,6 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
-  assets:
-    - packages/flutter_summernote/src/editor_components/core/fonts/summernote.ttf
-    - packages/flutter_summernote/src/editor_components/core/fonts/summernote.eot
-    - packages/flutter_summernote/src/editor_components/core/fonts/summernote.woff
-    - packages/flutter_summernote/src/editor_components/core/fonts/summernote.woff2
-    - packages/flutter_summernote/src/editor_components/core/css/bootstrap.css
-    - packages/flutter_summernote/src/editor_components/core/css/summernote.css
-    - packages/flutter_summernote/src/editor_components/core/js/jquery.js
-    - packages/flutter_summernote/src/editor_components/core/js/popper.js
-    - packages/flutter_summernote/src/editor_components/core/js/bootstrap.js
-    - packages/flutter_summernote/src/editor_components/core/js/summernote.js
-    - packages/flutter_summernote/src/editor_components/core/summernote.html
-
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
 
