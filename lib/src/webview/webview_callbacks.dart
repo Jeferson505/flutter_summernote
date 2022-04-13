@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -20,10 +18,13 @@ void onWebResourceError(WebResourceError e) {
 void onWebViewCreated(
   WebViewController webViewController,
   void Function(WebViewController) setWebViewController,
-  String page,
+  String? customToolbar,
+  String? customPopover,
 ) {
-  final String contentBase64 = base64Encode(const Utf8Encoder().convert(page));
-  webViewController.loadUrl('data:text/html;base64,$contentBase64').then((_) {
+  String key =
+      "packages/flutter_summernote/src/editor_components/core/summernote.html";
+
+  webViewController.loadFlutterAsset(key).then((_) {
     setWebViewController(webViewController);
   });
 }

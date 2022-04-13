@@ -3,8 +3,7 @@ library flutter_summernote;
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_summernote/src/editor_components/bottom_toolbar/bottom_toolbar.dart';
-import 'package:flutter_summernote/src/editor_functions/page_functions.dart';
+import 'package:flutter_summernote/src/editor_components/widgets/bottom_toolbar/bottom_toolbar.dart';
 import 'package:flutter_summernote/src/style/default_decoration.dart';
 import 'package:flutter_summernote/src/webview/webview_callbacks.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -52,17 +51,10 @@ class FlutterSummernote extends StatefulWidget {
 class FlutterSummernoteState extends State<FlutterSummernote> {
   WebViewController? _webViewController;
   String text = "";
-  late String _page;
   final Key _mapKey = UniqueKey();
 
   void _setWebViewController(WebViewController webViewController) {
     setState(() => _webViewController = webViewController);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _page = initPage(widget.customToolbar, widget.customPopover);
   }
 
   @override
@@ -85,7 +77,8 @@ class FlutterSummernoteState extends State<FlutterSummernote> {
               onWebViewCreated: (webViewController) => onWebViewCreated(
                 webViewController,
                 _setWebViewController,
-                _page,
+                widget.customToolbar,
+                widget.customPopover,
               ),
               javascriptMode: JavascriptMode.unrestricted,
               gestureNavigationEnabled: true,
@@ -142,7 +135,6 @@ class FlutterSummernoteState extends State<FlutterSummernote> {
   Future<String> getText() {
     String jsExpression =
         "setTimeout(function(){GetTextSummernote.postMessage(document.getElementsByClassName('note-editable')[0].innerHTML)}, 0);";
-    _webViewController?.goForward();
     _webViewController?.runJavascript(jsExpression);
 
     return Future.delayed(const Duration(milliseconds: 100)).then((_) => text);

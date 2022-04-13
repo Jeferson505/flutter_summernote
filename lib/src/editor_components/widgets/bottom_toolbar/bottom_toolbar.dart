@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_summernote/src/editor_components/bottom_toolbar/items_functions/attachment_functions.dart';
-import 'package:flutter_summernote/src/editor_components/bottom_toolbar/bottom_toolbar_item.dart';
-import 'package:flutter_summernote/src/editor_components/bottom_toolbar/items_functions/paste_functions.dart';
+import 'package:flutter_summernote/src/editor_components/widgets/bottom_toolbar/bottom_toolbar_item.dart';
+import 'package:flutter_summernote/src/editor_components/widgets/bottom_toolbar/items_functions/attachment_functions.dart';
+import 'package:flutter_summernote/src/editor_components/widgets/bottom_toolbar/items_functions/paste_functions.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class BottomToolbar extends StatelessWidget {
