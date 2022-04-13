@@ -85,6 +85,11 @@ class FlutterSummernoteState extends State<FlutterSummernote> {
               gestureRecognizers: gestureRecognizers,
               javascriptChannels: {getTextJavascriptChannel(context)},
               onPageFinished: (String url) {
+                lib_functions.initSummernote(
+                  _webViewController,
+                  widget.customToolbar,
+                  widget.customPopover,
+                );
                 setHint(widget.hint ?? "");
 
                 setFullContainer();

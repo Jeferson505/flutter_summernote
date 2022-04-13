@@ -1,4 +1,23 @@
+import 'package:flutter_summernote/src/editor_components/widgets/default_popover.dart';
+import 'package:flutter_summernote/src/editor_components/widgets/default_toolbar.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+
+void initSummernote(
+  WebViewController? webViewController,
+  String? customToolbar,
+  String? customPopover,
+) {
+  String toolbar = customToolbar ?? defaultToolbar;
+  String popover = customPopover ?? defaultPopover;
+
+  webViewController?.runJavascript("""\$("#summernote").summernote({
+    lang: 'pt-BR',
+    tabsize: 2,
+    placeholder: 'Your text here...',
+    toolbar: $toolbar,
+    popover: {$popover},
+  });""");
+}
 
 void setText(WebViewController? _webViewController, String value) {
   String txtIsi = value
