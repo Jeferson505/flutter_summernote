@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_summernote/src/editor_components/widgets/bottom_toolbar/bottom_toolbar_item.dart';
+import 'package:flutter_summernote/src/editor_components/widgets/bottom_toolbar/bottom_toolbar_labels.dart';
 import 'package:flutter_summernote/src/editor_components/widgets/bottom_toolbar/items_functions/attachment_functions.dart';
 import 'package:flutter_summernote/src/editor_components/widgets/bottom_toolbar/items_functions/paste_functions.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -9,6 +10,7 @@ class BottomToolbar extends StatelessWidget {
   final bool hasAttachment;
   final String widthImage;
   final void Function() copyText;
+  final BottomToolbarLabels bottomToolbarLabels;
 
   const BottomToolbar({
     Key? key,
@@ -16,6 +18,7 @@ class BottomToolbar extends StatelessWidget {
     required this.hasAttachment,
     required this.widthImage,
     required this.copyText,
+    required this.bottomToolbarLabels,
   }) : super(key: key);
 
   List<BottomToolbarItem> _generateBottomToolbar(BuildContext context) {
@@ -23,21 +26,26 @@ class BottomToolbar extends StatelessWidget {
       BottomToolbarItem(
         onTap: copyText,
         icon: Icons.content_copy,
-        label: "Copy",
+        label: bottomToolbarLabels.copyLabel,
       ),
       BottomToolbarItem(
         onTap: () => pasteText(webviewController),
         icon: Icons.content_paste,
-        label: "Paste",
+        label: bottomToolbarLabels.pasteLabel,
       ),
     ];
 
     if (hasAttachment) {
       _toolbar.add(
         BottomToolbarItem(
-          onTap: () => attach(context, webviewController, widthImage),
+          onTap: () => attach(
+            context,
+            webviewController,
+            widthImage,
+            bottomToolbarLabels,
+          ),
           icon: Icons.attach_file,
-          label: "Attach",
+          label: bottomToolbarLabels.attachmentLabel,
         ),
       );
     }

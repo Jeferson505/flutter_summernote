@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_summernote/src/editor_components/widgets/bottom_toolbar/bottom_toolbar_labels.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -12,6 +13,7 @@ void attach(
   BuildContext context,
   WebViewController _webViewController,
   String _widthImage,
+  BottomToolbarLabels _bottomToolbarLabels,
 ) {
   Future<File?> _getImage(bool fromCamera) async {
     final picked = await _imagePicker.pickImage(
@@ -40,8 +42,10 @@ void attach(
         children: <Widget>[
           ListTile(
             leading: const Icon(Icons.camera_alt),
-            title: const Text("Camera"),
-            subtitle: const Text("Attach image from camera"),
+            title: Text(_bottomToolbarLabels.cameraLabel),
+            subtitle: Text(
+              _bottomToolbarLabels.cameraAttachmentDescriptionLabel,
+            ),
             onTap: () async {
               Navigator.pop(context);
               final image = await _getImage(true);
@@ -50,8 +54,10 @@ void attach(
           ),
           ListTile(
             leading: const Icon(Icons.photo),
-            title: const Text("Gallery"),
-            subtitle: const Text("Attach image from gallery"),
+            title: Text(_bottomToolbarLabels.galleryLabel),
+            subtitle: Text(
+              _bottomToolbarLabels.galleryAttachmentDescriptionLabel,
+            ),
             onTap: () async {
               Navigator.pop(context);
               final image = await _getImage(false);

@@ -1,9 +1,12 @@
 library flutter_summernote;
 
+export 'src/editor_components/widgets/bottom_toolbar/bottom_toolbar_labels.dart';
+
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_summernote/src/editor_components/widgets/bottom_toolbar/bottom_toolbar.dart';
+import 'package:flutter_summernote/src/editor_components/widgets/bottom_toolbar/bottom_toolbar_labels.dart';
 import 'package:flutter_summernote/src/style/default_decoration.dart';
 import 'package:flutter_summernote/src/webview/webview_callbacks.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -29,6 +32,7 @@ class FlutterSummernote extends StatefulWidget {
   final bool hasAttachment;
   final bool showBottomToolbar;
   final Function(String)? returnContent;
+  final BottomToolbarLabels bottomToolbarLabels;
 
   const FlutterSummernote({
     Key? key,
@@ -42,6 +46,7 @@ class FlutterSummernote extends StatefulWidget {
     this.hasAttachment = false,
     this.showBottomToolbar = true,
     this.returnContent,
+    this.bottomToolbarLabels = const BottomToolbarLabels(),
   }) : super(key: key);
 
   @override
@@ -105,6 +110,7 @@ class FlutterSummernoteState extends State<FlutterSummernote> {
                   hasAttachment: widget.hasAttachment,
                   widthImage: widget.widthImage,
                   copyText: _copyText,
+                  bottomToolbarLabels: widget.bottomToolbarLabels,
                 )
               : const SizedBox(),
         ],
