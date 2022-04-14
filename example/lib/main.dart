@@ -1,30 +1,23 @@
+import 'package:example/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_summernote/flutter_summernote.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(title: 'Demo Flutter Summernote'),
+    return const MaterialApp(
+      title: "Demo Flutter Summernote",
+      home: MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  final String title;
-
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
+  const MyHomePage({Key? key}) : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -32,15 +25,14 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final GlobalKey<FlutterSummernoteState> _keyEditor = GlobalKey();
-  String result = "";
+  final GlobalKey<FlutterSummernoteState> _secondKeyEditor = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
-        elevation: 0,
-        actions: <Widget>[
+        title: const Text("Demo Flutter Summernote"),
+        actions: [
           IconButton(
             icon: const Icon(Icons.save),
             onPressed: () async {
@@ -54,19 +46,50 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
       backgroundColor: Colors.white,
-      body: FlutterSummernote(
-        offlineSupport: false,
-        hint: "Your text here...",
-        key: _keyEditor,
-        hasAttachment: true,
-        offlineModeLang: langsAvailableOffline.enUS,
-        customToolbar: """
-          [
-            ['style', ['bold', 'italic', 'underline', 'clear']],
-            ['font', ['strikethrough', 'superscript', 'subscript']],
-            ['insert', ['link', 'table', 'hr']]
-          ]
-        """,
+      body: Column(
+        children: [
+          const CustomText("Simple example and without offline support:"),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+              child: FlutterSummernote(
+                key: _keyEditor,
+                offlineSupport: false,
+                hint: "Start typing ...",
+              ),
+            ),
+          ),
+          const CustomText("Advanced example and with offline support:"),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: FlutterSummernote(
+                key: _secondKeyEditor,
+                offlineSupport: true,
+                hasAttachment: true,
+                customToolbar: """[
+                  ['style', ['bold', 'italic', 'underline', 'clear']],
+                  ['font', ['strikethrough', 'superscript', 'subscript']],
+                  ['insert', ['link', 'table']]
+                ]""",
+                value: "<p>Hello There</p>",
+                bottomToolbarLabels: const BottomToolbarLabels(
+                  copyLabel: "Copy text",
+                  attachmentLabel: "Attach file",
+                  pasteLabel: "Paste text",
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(
+                    color: Colors.grey[400]!,
+                    width: 2,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
