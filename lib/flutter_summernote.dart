@@ -1,12 +1,14 @@
 library flutter_summernote;
 
 export 'src/editor_components/widgets/bottom_toolbar/bottom_toolbar_labels.dart';
+export 'src/enums/langs/langs_available.dart';
 
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_summernote/src/editor_components/widgets/bottom_toolbar/bottom_toolbar.dart';
 import 'package:flutter_summernote/src/editor_components/widgets/bottom_toolbar/bottom_toolbar_labels.dart';
+import 'package:flutter_summernote/src/enums/langs/langs_available.dart';
 import 'package:flutter_summernote/src/style/default_decoration.dart';
 import 'package:flutter_summernote/src/webview/webview_callbacks.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -33,6 +35,8 @@ class FlutterSummernote extends StatefulWidget {
   final bool showBottomToolbar;
   final Function(String)? returnContent;
   final BottomToolbarLabels bottomToolbarLabels;
+  final langsAvailableOffline? offlineModeLang;
+  final allLangsAvailable lang;
 
   const FlutterSummernote({
     Key? key,
@@ -47,6 +51,8 @@ class FlutterSummernote extends StatefulWidget {
     this.showBottomToolbar = true,
     this.returnContent,
     this.bottomToolbarLabels = const BottomToolbarLabels(),
+    this.offlineModeLang,
+    this.lang = allLangsAvailable.enUS,
   }) : super(key: key);
 
   @override
@@ -60,6 +66,15 @@ class FlutterSummernoteState extends State<FlutterSummernote> {
 
   void _setWebViewController(WebViewController webViewController) {
     setState(() => _webViewController = webViewController);
+  }
+
+  allLangsAvailable _getSelectedLang() {
+    if (widget.offlineModeLang != null) {
+      return allLangsAvailable.values.firstWhere((element) {
+        return element.name == widget.offlineModeLang?.name;
+      });
+    }
+    return widget.lang;
   }
 
   @override
@@ -94,6 +109,7 @@ class FlutterSummernoteState extends State<FlutterSummernote> {
                   _webViewController,
                   widget.customToolbar,
                   widget.customPopover,
+                  _getSelectedLang(),
                 );
                 setHint(widget.hint ?? "");
 

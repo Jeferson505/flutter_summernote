@@ -58,6 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
         hint: "Your text here...",
         key: _keyEditor,
         hasAttachment: true,
+        offlineModeLang: langsAvailableOffline.enUS,
         customToolbar: """
           [
             ['style', ['bold', 'italic', 'underline', 'clear']],

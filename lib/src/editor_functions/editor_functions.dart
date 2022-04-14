@@ -1,17 +1,20 @@
 import 'package:flutter_summernote/src/editor_components/widgets/default_popover.dart';
 import 'package:flutter_summernote/src/editor_components/widgets/default_toolbar.dart';
+import 'package:flutter_summernote/src/enums/langs/langs_available_functions.dart';
+import 'package:flutter_summernote/src/enums/langs/langs_available.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 void initSummernote(
   WebViewController? webViewController,
   String? customToolbar,
   String? customPopover,
+  allLangsAvailable lang,
 ) {
   String toolbar = customToolbar ?? defaultToolbar;
   String popover = customPopover ?? defaultPopover;
 
   webViewController?.runJavascript("""\$("#summernote").summernote({
-    lang: 'pt-BR',
+    lang: '${langToString(lang)}',
     tabsize: 2,
     placeholder: 'Your text here...',
     toolbar: $toolbar,
