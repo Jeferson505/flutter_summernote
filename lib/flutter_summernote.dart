@@ -24,6 +24,7 @@ import 'package:flutter_summernote/src/editor_functions/editor_functions.dart'
 * */
 
 class FlutterSummernote extends StatefulWidget {
+  final bool offlineSupport;
   final String? value;
   final double? height;
   final BoxDecoration? decoration;
@@ -40,6 +41,7 @@ class FlutterSummernote extends StatefulWidget {
 
   const FlutterSummernote({
     Key? key,
+    required this.offlineSupport,
     this.value,
     this.height,
     this.decoration,
@@ -97,6 +99,7 @@ class FlutterSummernoteState extends State<FlutterSummernote> {
               onWebViewCreated: (webViewController) => onWebViewCreated(
                 webViewController,
                 _setWebViewController,
+                widget.offlineSupport,
                 widget.customToolbar,
                 widget.customPopover,
               ),

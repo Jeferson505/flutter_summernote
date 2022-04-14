@@ -54,6 +54,7 @@ flutter:
     - packages/flutter_summernote/src/editor_components/core/js/bootstrap.js
     - packages/flutter_summernote/src/editor_components/core/js/summernote.js
     - packages/flutter_summernote/src/editor_components/core/summernote.html
+    - packages/flutter_summernote/src/editor_components/core/offline_summernote.html
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

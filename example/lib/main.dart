@@ -55,6 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       backgroundColor: Colors.white,
       body: FlutterSummernote(
+        offlineSupport: false,
         hint: "Your text here...",
         key: _keyEditor,
         hasAttachment: true,

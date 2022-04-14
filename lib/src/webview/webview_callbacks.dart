@@ -18,11 +18,13 @@ void onWebResourceError(WebResourceError e) {
 void onWebViewCreated(
   WebViewController webViewController,
   void Function(WebViewController) setWebViewController,
+  bool offlineMode,
   String? customToolbar,
   String? customPopover,
 ) {
+  String htmlFile = offlineMode ? "offline_summernote.html" : "summernote.html";
   String key =
-      "packages/flutter_summernote/src/editor_components/core/summernote.html";
+      "packages/flutter_summernote/src/editor_components/core/$htmlFile";
 
   webViewController.loadFlutterAsset(key).then((_) {
     setWebViewController(webViewController);
