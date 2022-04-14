@@ -55,8 +55,13 @@ class BottomToolbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          left: BorderSide(color: Colors.grey[350]!),
+          bottom: BorderSide(color: Colors.grey[350]!),
+        ),
+      ),
       child: Row(children: _generateBottomToolbar(context)),
     );
   }

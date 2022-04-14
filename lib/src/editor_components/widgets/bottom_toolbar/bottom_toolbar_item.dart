@@ -15,14 +15,12 @@ class BottomToolbarItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        child: Row(
-          children: [
-            Icon(icon),
-            Text(label),
-          ],
-          mainAxisAlignment: MainAxisAlignment.center,
+      child: TextButton.icon(
+        onPressed: onTap,
+        icon: Icon(icon, size: 20, color: Colors.grey[800]),
+        label: Text(
+          label,
+          style: TextStyle(color: Colors.grey[800]),
         ),
       ),
     );
