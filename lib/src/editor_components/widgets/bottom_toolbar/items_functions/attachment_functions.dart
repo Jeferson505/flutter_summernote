@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_summernote/src/editor_components/widgets/bottom_toolbar/bottom_toolbar_labels.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
@@ -34,6 +35,8 @@ void attach(
     String txt = "\$('.note-editable').append( '" + base64Image + "');";
     _webViewController.runJavascript(txt);
   }
+
+  SystemChannels.textInput.invokeMethod('TextInput.hide');
 
   showModalBottomSheet(
     context: context,
