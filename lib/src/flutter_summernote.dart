@@ -202,7 +202,7 @@ class FlutterSummernote extends StatefulWidget {
   final allLangsAvailable lang;
 
   const FlutterSummernote({
-    Key? key,
+    required Key key,
     required this.offlineSupport,
     this.value,
     this.height,
