@@ -15,7 +15,9 @@ Rich Text Editor in Flutter for Android and iOS to help free write WYSIWYG HTML 
 To use flutter_summernote dependency by this repository, add the following code to your pubspec.yaml in dependencies section:
 ```yaml
     flutter_summernote:
-        git: https://github.com/Jeferson505/flutter_summernote.git
+        git:
+            url: https://github.com/Jeferson505/flutter_summernote.git
+            ref: v2.0.0    
 ```
 
 ### iOS
