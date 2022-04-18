@@ -1,3 +1,15 @@
+## [2.0.0] - 2022-04-17
+* Add offline mode support
+* Add offlineSupport param
+* Add bottomToolbarLabels param
+* Add languages as params (offlineModeLang, lang)
+* Add params description
+* Add click feedback in bottom toolbar options
+* Fix keyboard display above image picker options
+* Set key and offlineSupport as required params
+* Update example project
+* Add issues templates
+
 ## [1.0.1] - 2022-04-06
 * Update example project base code
 * Update dependent libs
