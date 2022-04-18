@@ -18,7 +18,7 @@ void initSummernote(
     tabsize: 2,
     placeholder: 'Your text here...',
     toolbar: $toolbar,
-    popover: {$popover},
+    popover: $popover,
   });""");
 }
 
