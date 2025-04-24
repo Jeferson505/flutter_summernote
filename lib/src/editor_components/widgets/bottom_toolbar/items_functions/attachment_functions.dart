@@ -12,11 +12,11 @@ final _imagePicker = ImagePicker();
 
 void attach(
   BuildContext context,
-  WebViewController _webViewController,
-  String _widthImage,
-  BottomToolbarLabels _bottomToolbarLabels,
+  WebViewController webViewController,
+  String widthImage,
+  BottomToolbarLabels bottomToolbarLabels,
 ) {
-  Future<File?> _getImage(bool fromCamera) async {
+  Future<File?> getImage(bool fromCamera) async {
     final picked = await _imagePicker.pickImage(
       source: (fromCamera) ? ImageSource.camera : ImageSource.gallery,
     );
@@ -24,16 +24,16 @@ void attach(
     return picked != null ? File(picked.path) : null;
   }
 
-  void _addImage(File image) async {
+  void addImage(File image) async {
     String filename = basename(image.path);
     List<int> imageBytes = await image.readAsBytes();
 
     String base64Image =
-        "<img width=\"$_widthImage\" src=\"data:image/png;base64, "
+        "<img width=\"$widthImage\" src=\"data:image/png;base64, "
         "${base64Encode(imageBytes)}\" data-filename=\"$filename\">";
 
-    String txt = "\$('.note-editable').append( '" + base64Image + "');";
-    _webViewController.runJavaScript(txt);
+    String txt = "\$('.note-editable').append( '$base64Image');";
+    webViewController.runJavaScript(txt);
   }
 
   SystemChannels.textInput.invokeMethod('TextInput.hide');
@@ -42,33 +42,33 @@ void attach(
     context: context,
     builder: (context) {
       return Column(
+        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           ListTile(
             leading: const Icon(Icons.camera_alt),
-            title: Text(_bottomToolbarLabels.cameraLabel),
+            title: Text(bottomToolbarLabels.cameraLabel),
             subtitle: Text(
-              _bottomToolbarLabels.cameraAttachmentDescriptionLabel,
+              bottomToolbarLabels.cameraAttachmentDescriptionLabel,
             ),
             onTap: () async {
               Navigator.pop(context);
-              final image = await _getImage(true);
-              if (image != null) _addImage(image);
+              final image = await getImage(true);
+              if (image != null) addImage(image);
             },
           ),
           ListTile(
             leading: const Icon(Icons.photo),
-            title: Text(_bottomToolbarLabels.galleryLabel),
+            title: Text(bottomToolbarLabels.galleryLabel),
             subtitle: Text(
-              _bottomToolbarLabels.galleryAttachmentDescriptionLabel,
+              bottomToolbarLabels.galleryAttachmentDescriptionLabel,
             ),
             onTap: () async {
               Navigator.pop(context);
-              final image = await _getImage(false);
-              if (image != null) _addImage(image);
+              final image = await getImage(false);
+              if (image != null) addImage(image);
             },
           ),
         ],
-        mainAxisSize: MainAxisSize.min,
       );
     },
   );

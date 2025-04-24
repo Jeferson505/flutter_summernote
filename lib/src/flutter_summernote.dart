@@ -188,7 +188,7 @@ class FlutterSummernote extends StatefulWidget {
   /// in offline mode and [offlineSupport] is true, the editor will use the default lang.
   ///
   /// Default value is null.
-  final langsAvailableOffline? offlineModeLang;
+  final LangsAvailableOffline? offlineModeLang;
 
   /// **Supported language by the editor to be used.**
   ///
@@ -199,7 +199,7 @@ class FlutterSummernote extends StatefulWidget {
   /// If [offlineModeLang] has been set, this property will be ignored.
   ///
   /// Default value is: offlineModeLang.enUS
-  final allLangsAvailable lang;
+  final AllLangsAvailable lang;
 
   const FlutterSummernote({
     required Key key,
@@ -216,7 +216,7 @@ class FlutterSummernote extends StatefulWidget {
     this.returnContent,
     this.bottomToolbarLabels = const BottomToolbarLabels(),
     this.offlineModeLang,
-    this.lang = allLangsAvailable.enUS,
+    this.lang = AllLangsAvailable.enUS,
   }) : super(key: key);
 
   @override

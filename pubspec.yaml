@@ -1,6 +1,6 @@
 name: flutter_summernote
 description: Rich Text Editor in Flutter for Android and iOS to help free write WYSIWYG HTML code based on Summernote 0.8.20 javascript wrapper.
-version: 2.0.0
+version: 3.0.0
 homepage: https://github.com/Jeferson505/flutter_summernote
 
 # The following defines the version and build number for your application.
@@ -19,18 +19,18 @@ homepage: https://github.com/Jeferson505/flutter_summernote
 # on any other native host app that you embed your Flutter project into.
 
 environment:
-  sdk: ">=2.16.2 <3.0.0"
+  sdk: ^3.7.2
 
 dependencies:
   flutter:
     sdk: flutter
   webview_flutter: ^4.11.0
-  image_picker: ^0.8.5
-  path: ^1.8.1
-  mime: ^1.0.1
+  image_picker: ^1.1.2
+  path: ^1.9.1
+  mime: ^2.0.0
 
 dev_dependencies:
-  flutter_lints: ^1.0.0
+  flutter_lints: ^5.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

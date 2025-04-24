@@ -1,6 +1,6 @@
 import 'package:flutter_summernote/src/enums/langs/langs_available.dart';
 
-String langToString(allLangsAvailable lang) {
+String langToString(AllLangsAvailable lang) {
   String language = lang.name;
 
   if (lang.name.length == 4) {

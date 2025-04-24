@@ -6,7 +6,7 @@
 * Inspired from: https://github.com/xrb21/flutter-html-editor
 * */
 
-library flutter_summernote;
+library;
 
 export 'src/editor_components/widgets/bottom_toolbar/bottom_toolbar_labels.dart';
 export 'src/enums/langs/langs_available.dart';

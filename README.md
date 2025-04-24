@@ -85,8 +85,8 @@ Parameter | Type | Default | Description
 **showBottomToolbar** | bool | true | Boolean representing if the bottom toolbar should be displayed
 **returnContent** | Function(String) | null | Callback function to get text content from editor
 **bottomToolbarLabels** | BottomToolbarLabels | null | Labels to be displayed in the bottom toolbar
-**offlineModeLang** | langsAvailableOffline | null | Supported language in offline mode to be used in editor
-**lang** | allLangsAvailable | `allLangsAvailable.enUS` | Supported language to be used in editor
+**offlineModeLang** | LangsAvailableOffline | null | Supported language in offline mode to be used in editor
+**lang** | AllLangsAvailable | `AllLangsAvailable.enUS` | Supported language to be used in editor
 
 ## License
 

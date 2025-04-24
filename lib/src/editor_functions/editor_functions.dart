@@ -8,7 +8,7 @@ void initSummernote(
   WebViewController? webViewController,
   String? customToolbar,
   String? customPopover,
-  allLangsAvailable lang,
+  AllLangsAvailable lang,
 ) {
   String toolbar = customToolbar ?? defaultToolbar;
   String popover = customPopover ?? defaultPopover;
@@ -22,7 +22,7 @@ void initSummernote(
   });""");
 }
 
-void setText(WebViewController? _webViewController, String value) {
+void setText(WebViewController? webViewController, String value) {
   String txtIsi = value
       .replaceAll("'", '\\"')
       .replaceAll('"', '\\"')
@@ -34,34 +34,26 @@ void setText(WebViewController? _webViewController, String value) {
       .replaceAll('\r\n', " ");
 
   String txt =
-      "document.getElementsByClassName('note-editable')[0].innerHTML = '" +
-          txtIsi +
-          "';";
+      "document.getElementsByClassName('note-editable')[0].innerHTML = '$txtIsi';";
 
-  _webViewController?.runJavaScript(txt);
+  webViewController?.runJavaScript(txt);
 }
 
-void setFullContainer(WebViewController? _webViewController) {
-  _webViewController?.runJavaScript(
+void setFullContainer(WebViewController? webViewController) {
+  webViewController?.runJavaScript(
     '\$("#summernote").summernote("fullscreen.toggle");',
   );
 }
 
-void setFocus(WebViewController? _webViewController) {
-  _webViewController?.runJavaScript(
-    "\$('#summernote').summernote('focus');",
-  );
+void setFocus(WebViewController? webViewController) {
+  webViewController?.runJavaScript("\$('#summernote').summernote('focus');");
 }
 
-void setEmpty(WebViewController? _webViewController) {
-  _webViewController?.runJavaScript(
-    "\$('#summernote').summernote('reset');",
-  );
+void setEmpty(WebViewController? webViewController) {
+  webViewController?.runJavaScript("\$('#summernote').summernote('reset');");
 }
 
-void setHint(WebViewController? _webViewController, String? text) {
+void setHint(WebViewController? webViewController, String? text) {
   String hint = '\$(".note-placeholder").html("$text");';
-  _webViewController?.runJavaScript(
-    "setTimeout(function(){$hint}, 0);",
-  );
+  webViewController?.runJavaScript("setTimeout(function(){$hint}, 0);");
 }

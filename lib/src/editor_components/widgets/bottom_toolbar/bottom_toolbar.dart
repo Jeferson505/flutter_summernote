@@ -13,16 +13,16 @@ class BottomToolbar extends StatelessWidget {
   final BottomToolbarLabels bottomToolbarLabels;
 
   const BottomToolbar({
-    Key? key,
+    super.key,
     required this.webviewController,
     required this.hasAttachment,
     required this.widthImage,
     required this.copyText,
     required this.bottomToolbarLabels,
-  }) : super(key: key);
+  });
 
   List<BottomToolbarItem> _generateBottomToolbar(BuildContext context) {
-    var _toolbar = [
+    var toolbar = [
       BottomToolbarItem(
         onTap: copyText,
         icon: Icons.content_copy,
@@ -36,21 +36,22 @@ class BottomToolbar extends StatelessWidget {
     ];
 
     if (hasAttachment) {
-      _toolbar.add(
+      toolbar.add(
         BottomToolbarItem(
-          onTap: () => attach(
-            context,
-            webviewController,
-            widthImage,
-            bottomToolbarLabels,
-          ),
+          onTap:
+              () => attach(
+                context,
+                webviewController,
+                widthImage,
+                bottomToolbarLabels,
+              ),
           icon: Icons.attach_file,
           label: bottomToolbarLabels.attachmentLabel,
         ),
       );
     }
 
-    return _toolbar;
+    return toolbar;
   }
 
   @override

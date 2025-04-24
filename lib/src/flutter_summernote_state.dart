@@ -17,19 +17,20 @@ class FlutterSummernoteState extends State<FlutterSummernote> {
 
   void _initWebViewController() {
     setState(() {
-      _webViewController = WebViewController()
-        ..setJavaScriptMode(JavaScriptMode.unrestricted)
-        ..addJavaScriptChannel(
-          'GetTextSummernote',
-          onMessageReceived: _onMessageReceived,
-        )
-        ..setNavigationDelegate(
-          NavigationDelegate(
-            onWebResourceError: onWebResourceError,
-            onPageStarted: _onPageStarted,
-            onPageFinished: _onPageFinished,
-          ),
-        );
+      _webViewController =
+          WebViewController()
+            ..setJavaScriptMode(JavaScriptMode.unrestricted)
+            ..addJavaScriptChannel(
+              'GetTextSummernote',
+              onMessageReceived: _onMessageReceived,
+            )
+            ..setNavigationDelegate(
+              NavigationDelegate(
+                onWebResourceError: onWebResourceError,
+                onPageStarted: _onPageStarted,
+                onPageFinished: _onPageFinished,
+              ),
+            );
     });
   }
 
@@ -75,9 +76,9 @@ class FlutterSummernoteState extends State<FlutterSummernote> {
     }
   }
 
-  allLangsAvailable _getSelectedLang() {
+  AllLangsAvailable _getSelectedLang() {
     if (widget.offlineModeLang != null) {
-      return allLangsAvailable.values.firstWhere((element) {
+      return AllLangsAvailable.values.firstWhere((element) {
         return element.name == widget.offlineModeLang?.name;
       });
     }
@@ -111,12 +112,12 @@ class FlutterSummernoteState extends State<FlutterSummernote> {
           ),
           widget.showBottomToolbar
               ? BottomToolbar(
-                  webviewController: _webViewController,
-                  hasAttachment: widget.hasAttachment,
-                  widthImage: widget.widthImage,
-                  copyText: _copyText,
-                  bottomToolbarLabels: widget.bottomToolbarLabels,
-                )
+                webviewController: _webViewController,
+                hasAttachment: widget.hasAttachment,
+                widthImage: widget.widthImage,
+                copyText: _copyText,
+                bottomToolbarLabels: widget.bottomToolbarLabels,
+              )
               : const SizedBox(),
         ],
       ),
@@ -132,8 +133,9 @@ class FlutterSummernoteState extends State<FlutterSummernote> {
         "setTimeout(function(){GetTextSummernote.postMessage(document.getElementsByClassName('note-editable')[0].innerHTML)}, 0);";
 
     return _webViewController.runJavaScript(jsExpression).then((_) {
-      return Future.delayed(const Duration(milliseconds: 500))
-          .then((_) => text);
+      return Future.delayed(
+        const Duration(milliseconds: 500),
+      ).then((_) => text);
     });
   }
 

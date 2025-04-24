@@ -1,13 +1,6 @@
-enum langsAvailableOffline {
-  enUS,
-  esES,
-  esEU,
-  frFR,
-  ptBR,
-  ptPT,
-}
+enum LangsAvailableOffline { enUS, esES, esEU, frFR, ptBR, ptPT }
 
-enum allLangsAvailable {
+enum AllLangsAvailable {
   arAR,
   azAZ,
   bgBG,

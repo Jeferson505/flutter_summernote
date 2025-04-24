@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-pasteText(WebViewController _webViewController) {
+pasteText(WebViewController webViewController) {
   Clipboard.getData(Clipboard.kTextPlain).then((data) {
     if (data?.text != null) {
       String txtIsi = data!.text!
@@ -15,7 +15,7 @@ pasteText(WebViewController _webViewController) {
           .replaceAll('\r\n', " ");
 
       String txt = "\$('.note-editable').append( '$txtIsi');";
-      _webViewController.runJavaScript(txt);
+      webViewController.runJavaScript(txt);
     }
   });
 }
