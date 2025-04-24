@@ -5,27 +5,40 @@ import 'package:flutter_summernote/flutter_summernote.dart';
 void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
       title: "Demo Flutter Summernote",
-      home: MyHomePage(),
+      home: _MyHomePage(key: Key('home-page-key')),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key}) : super(key: key);
+class _MyHomePage extends StatefulWidget {
+  const _MyHomePage({super.key});
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<_MyHomePage> {
   final GlobalKey<FlutterSummernoteState> _keyEditor = GlobalKey();
   final GlobalKey<FlutterSummernoteState> _secondKeyEditor = GlobalKey();
+
+  void onPressed() async {
+    final value = await _keyEditor.currentState?.getText();
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          duration: const Duration(seconds: 5),
+          content: Text(value ?? '-'),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,16 +46,7 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: const Text("Demo Flutter Summernote"),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.save),
-            onPressed: () async {
-              final value = (await _keyEditor.currentState?.getText());
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                duration: const Duration(seconds: 5),
-                content: Text(value ?? "-"),
-              ));
-            },
-          )
+          IconButton(icon: const Icon(Icons.save), onPressed: onPressed),
         ],
       ),
       backgroundColor: Colors.white,
@@ -81,10 +85,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 decoration: BoxDecoration(
                   color: Colors.grey[300],
                   borderRadius: BorderRadius.circular(4),
-                  border: Border.all(
-                    color: Colors.grey[400]!,
-                    width: 2,
-                  ),
+                  border: Border.all(color: Colors.grey[400]!, width: 2),
                 ),
               ),
             ),
