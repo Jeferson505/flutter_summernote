@@ -5,17 +5,90 @@ import 'package:flutter_summernote/src/enums/langs/langs_available.dart';
 import 'package:flutter_summernote/src/flutter_summernote.dart';
 import 'package:flutter_summernote/src/style/default_decoration.dart';
 import 'package:flutter_summernote/src/webview/webview_callbacks.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 import 'package:flutter_summernote/src/editor_functions/editor_functions.dart'
     as lib_functions;
+import 'package:webview_flutter/webview_flutter.dart';
+
+// Import for iOS/macOS features.
+import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
 class FlutterSummernoteState extends State<FlutterSummernote> {
-  WebViewController? _webViewController;
-  String text = "";
-  final Key _mapKey = UniqueKey();
+  late WebViewController _webViewController;
 
-  void _setWebViewController(WebViewController webViewController) {
-    setState(() => _webViewController = webViewController);
+  final Key _mapKey = UniqueKey();
+  String text = "";
+
+  PlatformWebViewControllerCreationParams get _params {
+    if (WebViewPlatform.instance is WebKitWebViewPlatform) {
+      return WebKitWebViewControllerCreationParams();
+    }
+
+    return const PlatformWebViewControllerCreationParams();
+  }
+
+  WebKitWebViewController get _webKitWebViewController =>
+      WebKitWebViewController(_params)
+        ..setAllowsBackForwardNavigationGestures(true);
+
+  void _initWebViewController() {
+    setState(() {
+      _webViewController =
+          WebViewController.fromPlatform(_webKitWebViewController)
+            ..setJavaScriptMode(JavaScriptMode.unrestricted)
+            ..addJavaScriptChannel(
+              'GetTextSummernote',
+              onMessageReceived: _onMessageReceived,
+            )
+            ..setNavigationDelegate(
+              NavigationDelegate(
+                onWebResourceError: onWebResourceError,
+                onPageStarted: _onPageStarted,
+                onPageFinished: _onPageFinished,
+              ),
+            );
+    });
+  }
+
+  void _onPageStarted(String _) {
+    onWebViewCreated(
+      _webViewController,
+      widget.offlineSupport,
+      widget.customToolbar,
+      widget.customPopover,
+    );
+  }
+
+  void _onMessageReceived(JavaScriptMessage message) {
+    String isi = message.message;
+
+    if (isi.isEmpty ||
+        isi == "<p></p>" ||
+        isi == "<p><br></p>" ||
+        isi == "<p><br/></p>") {
+      isi = "";
+    }
+
+    setState(() => text = isi);
+
+    if (widget.returnContent != null) {
+      widget.returnContent!(text);
+    }
+  }
+
+  void _onPageFinished(String url) {
+    lib_functions.initSummernote(
+      _webViewController,
+      widget.customToolbar,
+      widget.customPopover,
+      _getSelectedLang(),
+    );
+
+    setHint(widget.hint ?? "");
+    setFullContainer();
+
+    if (widget.value != null) {
+      setText(widget.value!);
+    }
   }
 
   allLangsAvailable _getSelectedLang() {
@@ -28,8 +101,13 @@ class FlutterSummernoteState extends State<FlutterSummernote> {
   }
 
   @override
+  void initState() {
+    _initWebViewController();
+    super.initState();
+  }
+
+  @override
   void dispose() {
-    if (_webViewController != null) _webViewController = null;
     super.dispose();
   }
 
@@ -41,39 +119,15 @@ class FlutterSummernoteState extends State<FlutterSummernote> {
       child: Column(
         children: [
           Expanded(
-            child: WebView(
+            child: WebViewWidget(
               key: _mapKey,
-              onWebResourceError: onWebResourceError,
-              onWebViewCreated: (webViewController) => onWebViewCreated(
-                webViewController,
-                _setWebViewController,
-                widget.offlineSupport,
-                widget.customToolbar,
-                widget.customPopover,
-              ),
-              javascriptMode: JavascriptMode.unrestricted,
-              gestureNavigationEnabled: true,
+              controller: _webViewController,
               gestureRecognizers: gestureRecognizers,
-              javascriptChannels: {getTextJavascriptChannel(context)},
-              onPageFinished: (String url) {
-                lib_functions.initSummernote(
-                  _webViewController,
-                  widget.customToolbar,
-                  widget.customPopover,
-                  _getSelectedLang(),
-                );
-                setHint(widget.hint ?? "");
-
-                setFullContainer();
-                if (widget.value != null) {
-                  setText(widget.value!);
-                }
-              },
             ),
           ),
-          widget.showBottomToolbar && _webViewController != null
+          widget.showBottomToolbar
               ? BottomToolbar(
-                  webviewController: _webViewController!,
+                  webviewController: _webViewController,
                   hasAttachment: widget.hasAttachment,
                   widthImage: widget.widthImage,
                   copyText: _copyText,
@@ -85,27 +139,6 @@ class FlutterSummernoteState extends State<FlutterSummernote> {
     );
   }
 
-  JavascriptChannel getTextJavascriptChannel(BuildContext context) {
-    return JavascriptChannel(
-      name: 'GetTextSummernote',
-      onMessageReceived: (JavascriptMessage message) {
-        String isi = message.message;
-        if (isi.isEmpty ||
-            isi == "<p></p>" ||
-            isi == "<p><br></p>" ||
-            isi == "<p><br/></p>") {
-          isi = "";
-        }
-
-        setState(() => text = isi);
-
-        if (widget.returnContent != null) {
-          widget.returnContent!(text);
-        }
-      },
-    );
-  }
-
   void _copyText() {
     getText().then((value) => Clipboard.setData(ClipboardData(text: value)));
   }
@@ -114,7 +147,7 @@ class FlutterSummernoteState extends State<FlutterSummernote> {
     String jsExpression =
         "setTimeout(function(){GetTextSummernote.postMessage(document.getElementsByClassName('note-editable')[0].innerHTML)}, 0);";
 
-    return _webViewController!.runJavascript(jsExpression).then((_) {
+    return _webViewController.runJavaScript(jsExpression).then((_) {
       return Future.delayed(const Duration(milliseconds: 500))
           .then((_) => text);
     });

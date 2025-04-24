@@ -33,7 +33,7 @@ void attach(
         "${base64Encode(imageBytes)}\" data-filename=\"$filename\">";
 
     String txt = "\$('.note-editable').append( '" + base64Image + "');";
-    _webViewController.runJavascript(txt);
+    _webViewController.runJavaScript(txt);
   }
 
   SystemChannels.textInput.invokeMethod('TextInput.hide');

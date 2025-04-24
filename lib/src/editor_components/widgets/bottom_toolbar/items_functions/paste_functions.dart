@@ -15,7 +15,7 @@ pasteText(WebViewController _webViewController) {
           .replaceAll('\r\n', " ");
 
       String txt = "\$('.note-editable').append( '$txtIsi');";
-      _webViewController.runJavascript(txt);
+      _webViewController.runJavaScript(txt);
     }
   });
 }

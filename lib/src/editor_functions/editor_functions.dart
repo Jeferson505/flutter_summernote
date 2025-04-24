@@ -13,7 +13,7 @@ void initSummernote(
   String toolbar = customToolbar ?? defaultToolbar;
   String popover = customPopover ?? defaultPopover;
 
-  webViewController?.runJavascript("""\$("#summernote").summernote({
+  webViewController?.runJavaScript("""\$("#summernote").summernote({
     lang: '${langToString(lang)}',
     tabsize: 2,
     placeholder: 'Your text here...',
@@ -38,30 +38,30 @@ void setText(WebViewController? _webViewController, String value) {
           txtIsi +
           "';";
 
-  _webViewController?.runJavascript(txt);
+  _webViewController?.runJavaScript(txt);
 }
 
 void setFullContainer(WebViewController? _webViewController) {
-  _webViewController?.runJavascript(
+  _webViewController?.runJavaScript(
     '\$("#summernote").summernote("fullscreen.toggle");',
   );
 }
 
 void setFocus(WebViewController? _webViewController) {
-  _webViewController?.runJavascript(
+  _webViewController?.runJavaScript(
     "\$('#summernote').summernote('focus');",
   );
 }
 
 void setEmpty(WebViewController? _webViewController) {
-  _webViewController?.runJavascript(
+  _webViewController?.runJavaScript(
     "\$('#summernote').summernote('reset');",
   );
 }
 
 void setHint(WebViewController? _webViewController, String? text) {
   String hint = '\$(".note-placeholder").html("$text");';
-  _webViewController?.runJavascript(
+  _webViewController?.runJavaScript(
     "setTimeout(function(){$hint}, 0);",
   );
 }

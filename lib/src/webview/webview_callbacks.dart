@@ -10,14 +10,13 @@ void onWebResourceError(WebResourceError e) {
       "Flutter Summernote - WebViewResourceError (${DateTime.now()})",
       name: "Flutter Summernote",
       error:
-          "${e.description}\nError Type:${e.errorType}\nError Code:${e.errorCode}\nDomain:${e.domain}\nFailingUrl:${e.failingUrl}",
+          "${e.description}\nError Type:${e.errorType}\nError Code:${e.errorCode}\nFrom Main Frame:${e.isForMainFrame}\nURL:${e.url}",
     );
   }
 }
 
 void onWebViewCreated(
   WebViewController webViewController,
-  void Function(WebViewController) setWebViewController,
   bool offlineMode,
   String? customToolbar,
   String? customPopover,
@@ -26,9 +25,7 @@ void onWebViewCreated(
   String key =
       "packages/flutter_summernote/src/editor_components/core/$htmlFile";
 
-  webViewController.loadFlutterAsset(key).then((_) {
-    setWebViewController(webViewController);
-  });
+  webViewController.loadFlutterAsset(key);
 }
 
 Set<Factory<OneSequenceGestureRecognizer>> gestureRecognizers = {
