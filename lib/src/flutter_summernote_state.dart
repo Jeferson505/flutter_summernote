@@ -9,43 +9,27 @@ import 'package:flutter_summernote/src/editor_functions/editor_functions.dart'
     as lib_functions;
 import 'package:webview_flutter/webview_flutter.dart';
 
-// Import for iOS/macOS features.
-import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
-
 class FlutterSummernoteState extends State<FlutterSummernote> {
   late WebViewController _webViewController;
 
   final Key _mapKey = UniqueKey();
   String text = "";
 
-  PlatformWebViewControllerCreationParams get _params {
-    if (WebViewPlatform.instance is WebKitWebViewPlatform) {
-      return WebKitWebViewControllerCreationParams();
-    }
-
-    return const PlatformWebViewControllerCreationParams();
-  }
-
-  WebKitWebViewController get _webKitWebViewController =>
-      WebKitWebViewController(_params)
-        ..setAllowsBackForwardNavigationGestures(true);
-
   void _initWebViewController() {
     setState(() {
-      _webViewController =
-          WebViewController.fromPlatform(_webKitWebViewController)
-            ..setJavaScriptMode(JavaScriptMode.unrestricted)
-            ..addJavaScriptChannel(
-              'GetTextSummernote',
-              onMessageReceived: _onMessageReceived,
-            )
-            ..setNavigationDelegate(
-              NavigationDelegate(
-                onWebResourceError: onWebResourceError,
-                onPageStarted: _onPageStarted,
-                onPageFinished: _onPageFinished,
-              ),
-            );
+      _webViewController = WebViewController()
+        ..setJavaScriptMode(JavaScriptMode.unrestricted)
+        ..addJavaScriptChannel(
+          'GetTextSummernote',
+          onMessageReceived: _onMessageReceived,
+        )
+        ..setNavigationDelegate(
+          NavigationDelegate(
+            onWebResourceError: onWebResourceError,
+            onPageStarted: _onPageStarted,
+            onPageFinished: _onPageFinished,
+          ),
+        );
     });
   }
 
