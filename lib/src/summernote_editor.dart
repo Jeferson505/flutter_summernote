@@ -7,7 +7,6 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -63,11 +62,15 @@ class SummernoteEditor extends StatefulWidget {
 class _SummernoteEditorState extends State<SummernoteEditor> {
   late final WebViewController _webViewController;
   late final String _editorId;
-  
+
   EditorState _state = EditorState.initializing;
-  EditorContent _content = const EditorContent(html: '', text: '', isEmpty: true);
+  EditorContent _content = const EditorContent(
+    html: '',
+    text: '',
+    isEmpty: true,
+  );
   SummernoteException? _lastError;
-  
+
   int _retryCount = 0;
   Timer? _retryTimer;
   Timer? _autoSaveTimer;
@@ -77,14 +80,13 @@ class _SummernoteEditorState extends State<SummernoteEditor> {
     super.initState();
     _editorId = EditorUtils.generateEditorId();
 
-    
     if (widget.config.debugMode) {
       debugPrint('SummernoteEditor: Initializing editor $_editorId');
     }
 
     // Bind controller if provided
     widget.controller?._bind(this);
-    
+
     _initializeEditor();
   }
 
@@ -98,7 +100,7 @@ class _SummernoteEditorState extends State<SummernoteEditor> {
     _autoSaveTimer?.cancel();
     widget.controller?._unbind();
     _setState(EditorState.disposed);
-    
+
     super.dispose();
   }
 
@@ -108,15 +110,18 @@ class _SummernoteEditorState extends State<SummernoteEditor> {
       _setState(EditorState.initializing);
       _setupWebViewController();
       _startInitializationTimeout();
-      
+
       if (widget.config.autoSave) {
         _startAutoSave();
       }
     } catch (e, stackTrace) {
-      _handleError(EditorExceptions.initializationFailed(
-        'Failed to initialize editor: $e',
-        cause: e,
-      ), stackTrace);
+      _handleError(
+        EditorExceptions.initializationFailed(
+          'Failed to initialize editor: $e',
+          cause: e,
+        ),
+        stackTrace,
+      );
     }
   }
 
@@ -125,11 +130,13 @@ class _SummernoteEditorState extends State<SummernoteEditor> {
     _webViewController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(widget.theme.backgroundColor)
-      ..setNavigationDelegate(NavigationDelegate(
-        onPageStarted: _onPageStarted,
-        onPageFinished: _onPageFinished,
-        onWebResourceError: _onWebResourceError,
-      ))
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onPageStarted: _onPageStarted,
+          onPageFinished: _onPageFinished,
+          onWebResourceError: _onWebResourceError,
+        ),
+      )
       ..addJavaScriptChannel(
         'SummernoteReady',
         onMessageReceived: _onSummernoteReady,
@@ -159,7 +166,7 @@ class _SummernoteEditorState extends State<SummernoteEditor> {
       mimeType: 'text/html',
       encoding: Encoding.getByName('utf-8'),
     );
-    
+
     _webViewController.loadRequest(uri);
   }
 
@@ -167,14 +174,14 @@ class _SummernoteEditorState extends State<SummernoteEditor> {
   String _generateEditorHtml() {
     final summernoteVersion = '0.8.20';
     final jqueryVersion = '3.6.0';
-    
+
     final cdnBase = widget.config.mode == EditorMode.online
         ? 'https://cdnjs.cloudflare.com/ajax/libs'
         : 'assets/packages/flutter_summernote/assets';
 
     final toolbarHtml = _generateToolbarHtml();
     final customCss = widget.theme.generateCss();
-    
+
     return '''
 <!DOCTYPE html>
 <html lang="${widget.config.language.code}">
@@ -200,7 +207,7 @@ class _SummernoteEditorState extends State<SummernoteEditor> {
             margin: 0;
             padding: 8px;
             font-family: ${widget.theme.fontFamily};
-            background-color: ${widget.theme.backgroundColor.value.toRadixString(16)};
+            background-color: #${widget.theme.backgroundColor.toARGB32().toRadixString(16).padLeft(8, '0')};
         }
         
         .editor-container {
@@ -463,7 +470,7 @@ class _SummernoteEditorState extends State<SummernoteEditor> {
           .where((button) => button.visible)
           .map((button) => "'${button.name}'")
           .toList();
-      
+
       return "['${group.name}', [${buttons.join(', ')}]]";
     }).toList();
 
@@ -474,10 +481,13 @@ class _SummernoteEditorState extends State<SummernoteEditor> {
   void _startInitializationTimeout() {
     Timer(widget.config.timeout, () {
       if (_state == EditorState.initializing) {
-        _handleError(EditorExceptions.timeout(
-          'Editor initialization',
-          widget.config.timeout,
-        ), null);
+        _handleError(
+          EditorExceptions.timeout(
+            'Editor initialization',
+            widget.config.timeout,
+          ),
+          null,
+        );
       }
     });
   }
@@ -515,33 +525,40 @@ class _SummernoteEditorState extends State<SummernoteEditor> {
 
   /// Handle web resource errors
   void _onWebResourceError(WebResourceError error) {
-    _handleError(EditorExceptions.webViewError(
-      'WebView resource error: ${error.description}',
-      cause: error,
-    ), null);
+    _handleError(
+      EditorExceptions.webViewError(
+        'WebView resource error: ${error.description}',
+        cause: error,
+      ),
+      null,
+    );
   }
 
   /// Handle Summernote ready message
   void _onSummernoteReady(JavaScriptMessage message) {
     try {
       final data = jsonDecode(message.message) as Map<String, dynamic>;
-      
+
       if (data['ready'] == true) {
-        final initTime = Duration(milliseconds: data['initializationTime'] ?? 0);
+        final initTime = Duration(
+          milliseconds: data['initializationTime'] ?? 0,
+        );
         _setState(EditorState.ready);
-        
+
         if (widget.config.debugMode) {
-          debugPrint('SummernoteEditor: Editor ready in ${initTime.inMilliseconds}ms');
+          debugPrint(
+            'SummernoteEditor: Editor ready in ${initTime.inMilliseconds}ms',
+          );
         }
-        
+
         widget.onReady?.call();
         widget.config.callbacks.onReady?.call(initTime);
       }
     } catch (e) {
-      _handleError(EditorExceptions.jsError(
-        'Failed to parse ready message: $e',
-        cause: e,
-      ), null);
+      _handleError(
+        EditorExceptions.jsError('Failed to parse ready message: $e', cause: e),
+        null,
+      );
     }
   }
 
@@ -550,24 +567,30 @@ class _SummernoteEditorState extends State<SummernoteEditor> {
     try {
       final data = jsonDecode(message.message) as Map<String, dynamic>;
       final html = data['html'] as String? ?? '';
-      
+
       final newContent = EditorUtils.createContent(html);
-      
+
       if (newContent != _content) {
         _content = newContent;
-        
+
         widget.onContentChanged?.call(_content);
-        widget.config.callbacks.onContentChanged?.call(_content, ContentChangeType.user);
-        
+        widget.config.callbacks.onContentChanged?.call(
+          _content,
+          ContentChangeType.user,
+        );
+
         if (widget.config.debugMode) {
           EditorUtils.debugContent(html, label: 'Content Changed');
         }
       }
     } catch (e) {
-      _handleError(EditorExceptions.jsError(
-        'Failed to parse content change: $e',
-        cause: e,
-      ), null);
+      _handleError(
+        EditorExceptions.jsError(
+          'Failed to parse content change: $e',
+          cause: e,
+        ),
+        null,
+      );
     }
   }
 
@@ -577,15 +600,16 @@ class _SummernoteEditorState extends State<SummernoteEditor> {
       final data = jsonDecode(message.message) as Map<String, dynamic>;
       final error = data['error'] as String? ?? 'Unknown error';
       final context = data['context'] as String? ?? 'Unknown context';
-      
-      _handleError(EditorExceptions.jsError(
-        'JavaScript error in $context: $error',
-      ), null);
+
+      _handleError(
+        EditorExceptions.jsError('JavaScript error in $context: $error'),
+        null,
+      );
     } catch (e) {
-      _handleError(EditorExceptions.jsError(
-        'Failed to parse error message: $e',
-        cause: e,
-      ), null);
+      _handleError(
+        EditorExceptions.jsError('Failed to parse error message: $e', cause: e),
+        null,
+      );
     }
   }
 
@@ -595,7 +619,7 @@ class _SummernoteEditorState extends State<SummernoteEditor> {
       final data = jsonDecode(message.message) as Map<String, dynamic>;
       final type = data['type'] as String;
       final eventData = data['data'] as Map<String, dynamic>? ?? {};
-      
+
       switch (type) {
         case 'focus':
           widget.config.callbacks.onFocusChanged?.call(FocusState.focused);
@@ -608,8 +632,13 @@ class _SummernoteEditorState extends State<SummernoteEditor> {
           final ctrlKey = eventData['ctrlKey'] as bool? ?? false;
           final shiftKey = eventData['shiftKey'] as bool? ?? false;
           final altKey = eventData['altKey'] as bool? ?? false;
-          
-          widget.config.callbacks.onKeyEvent?.call(key, ctrlKey, shiftKey, altKey);
+
+          widget.config.callbacks.onKeyEvent?.call(
+            key,
+            ctrlKey,
+            shiftKey,
+            altKey,
+          );
           break;
         case 'paste':
           final clipboardData = eventData['clipboardData'] as String? ?? '';
@@ -628,16 +657,18 @@ class _SummernoteEditorState extends State<SummernoteEditor> {
     if (_state != newState) {
       final previousState = _state;
       _state = newState;
-      
+
       if (mounted) {
         setState(() {});
       }
-      
+
       widget.onStateChanged?.call(_state);
       widget.config.callbacks.onStateChanged?.call(previousState, _state);
-      
+
       if (widget.config.debugMode) {
-        debugPrint('SummernoteEditor: State changed from $previousState to $newState');
+        debugPrint(
+          'SummernoteEditor: State changed from $previousState to $newState',
+        );
       }
     }
   }
@@ -645,25 +676,27 @@ class _SummernoteEditorState extends State<SummernoteEditor> {
   /// Handle errors with retry logic
   void _handleError(SummernoteException exception, StackTrace? stackTrace) {
     _lastError = exception;
-    
+
     if (widget.config.debugMode) {
       debugPrint('SummernoteEditor: Error occurred: $exception');
       if (stackTrace != null) {
         debugPrint('Stack trace: $stackTrace');
       }
     }
-    
+
     widget.onError?.call(exception);
     widget.config.callbacks.onError?.call(exception);
-    
+
     // Retry logic for recoverable errors
     if (exception.recoverable && _retryCount < widget.config.retryAttempts) {
       _retryCount++;
-      
+
       if (widget.config.debugMode) {
-        debugPrint('SummernoteEditor: Retrying initialization (attempt $_retryCount/${widget.config.retryAttempts})');
+        debugPrint(
+          'SummernoteEditor: Retrying initialization (attempt $_retryCount/${widget.config.retryAttempts})',
+        );
       }
-      
+
       _retryTimer = Timer(widget.config.retryDelay, () {
         _initializeEditor();
       });
@@ -675,7 +708,9 @@ class _SummernoteEditorState extends State<SummernoteEditor> {
   /// Execute JavaScript in the editor
   Future<String?> _executeJs(String script) async {
     try {
-      final result = await _webViewController.runJavaScriptReturningResult(script);
+      final result = await _webViewController.runJavaScriptReturningResult(
+        script,
+      );
       return result.toString();
     } catch (e) {
       if (widget.config.debugMode) {
@@ -697,11 +732,11 @@ class _SummernoteEditorState extends State<SummernoteEditor> {
       decoration: BoxDecoration(
         color: widget.theme.backgroundColor,
         border: Border.all(
-          color: _state == EditorState.error 
+          color: _state == EditorState.error
               ? widget.theme.errorBorderColor
-              : (_state == EditorState.ready 
-                  ? widget.theme.focusBorderColor 
-                  : widget.theme.borderColor),
+              : (_state == EditorState.ready
+                    ? widget.theme.focusBorderColor
+                    : widget.theme.borderColor),
           width: widget.theme.borderWidth,
         ),
         borderRadius: BorderRadius.circular(widget.theme.borderRadius),
@@ -713,12 +748,10 @@ class _SummernoteEditorState extends State<SummernoteEditor> {
           children: [
             if (_state != EditorState.disposed)
               WebViewWidget(controller: _webViewController),
-            
-            if (_state == EditorState.initializing)
-              _buildLoadingOverlay(),
-            
-            if (_state == EditorState.error)
-              _buildErrorOverlay(),
+
+            if (_state == EditorState.initializing) _buildLoadingOverlay(),
+
+            if (_state == EditorState.error) _buildErrorOverlay(),
           ],
         ),
       ),
@@ -728,7 +761,7 @@ class _SummernoteEditorState extends State<SummernoteEditor> {
   /// Build loading overlay
   Widget _buildLoadingOverlay() {
     return Container(
-      color: widget.theme.loadingOverlayColor.withOpacity(0.9),
+      color: widget.theme.loadingOverlayColor.withValues(alpha: 0.9),
       child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -739,17 +772,14 @@ class _SummernoteEditorState extends State<SummernoteEditor> {
             const SizedBox(height: 16),
             Text(
               'Loading editor...',
-              style: TextStyle(
-                color: widget.theme.textColor,
-                fontSize: 16,
-              ),
+              style: TextStyle(color: widget.theme.textColor, fontSize: 16),
             ),
             if (_retryCount > 0) ...[
               const SizedBox(height: 8),
               Text(
                 'Retry attempt $_retryCount/${widget.config.retryAttempts}',
                 style: TextStyle(
-                  color: widget.theme.textColor.withOpacity(0.7),
+                  color: widget.theme.textColor.withValues(alpha: 0.7),
                   fontSize: 12,
                 ),
               ),
@@ -763,7 +793,7 @@ class _SummernoteEditorState extends State<SummernoteEditor> {
   /// Build error overlay
   Widget _buildErrorOverlay() {
     return Container(
-      color: widget.theme.errorOverlayColor.withOpacity(0.1),
+      color: widget.theme.errorOverlayColor.withValues(alpha: 0.1),
       child: Center(
         child: Padding(
           padding: const EdgeInsets.all(20),
@@ -833,7 +863,9 @@ class SummernoteController {
   EditorState get state => _state?._state ?? EditorState.disposed;
 
   /// Get current content
-  EditorContent get content => _state?._content ?? const EditorContent(html: '', text: '', isEmpty: true);
+  EditorContent get content =>
+      _state?._content ??
+      const EditorContent(html: '', text: '', isEmpty: true);
 
   /// Get last error
   SummernoteException? get lastError => _state?._lastError;
@@ -841,9 +873,11 @@ class SummernoteController {
   /// Set content programmatically
   Future<bool> setContent(String html) async {
     if (_state == null || _state!._state != EditorState.ready) return false;
-    
+
     try {
-      final script = EditorUtils.createJsCall('window.editorAPI.setContent', [html]);
+      final script = EditorUtils.createJsCall('window.editorAPI.setContent', [
+        html,
+      ]);
       await _state!._executeJs(script);
       return true;
     } catch (e) {
@@ -854,7 +888,7 @@ class SummernoteController {
   /// Get content programmatically
   Future<String?> getContent() async {
     if (_state == null || _state!._state != EditorState.ready) return null;
-    
+
     try {
       final result = await _state!._executeJs('window.editorAPI.getContent()');
       return result?.replaceAll('"', ''); // Remove quotes from JSON string
@@ -866,9 +900,11 @@ class SummernoteController {
   /// Insert text at cursor position
   Future<bool> insertText(String text) async {
     if (_state == null || _state!._state != EditorState.ready) return false;
-    
+
     try {
-      final script = EditorUtils.createJsCall('window.editorAPI.insertText', [text]);
+      final script = EditorUtils.createJsCall('window.editorAPI.insertText', [
+        text,
+      ]);
       await _state!._executeJs(script);
       return true;
     } catch (e) {
@@ -879,7 +915,7 @@ class SummernoteController {
   /// Focus the editor
   Future<bool> focus() async {
     if (_state == null || _state!._state != EditorState.ready) return false;
-    
+
     try {
       await _state!._executeJs('window.editorAPI.focus()');
       return true;
@@ -891,7 +927,7 @@ class SummernoteController {
   /// Blur the editor
   Future<bool> blur() async {
     if (_state == null || _state!._state != EditorState.ready) return false;
-    
+
     try {
       await _state!._executeJs('window.editorAPI.blur()');
       return true;
@@ -903,7 +939,7 @@ class SummernoteController {
   /// Enable the editor
   Future<bool> enable() async {
     if (_state == null || _state!._state != EditorState.ready) return false;
-    
+
     try {
       await _state!._executeJs('window.editorAPI.enable()');
       return true;
@@ -915,7 +951,7 @@ class SummernoteController {
   /// Disable the editor
   Future<bool> disable() async {
     if (_state == null || _state!._state != EditorState.ready) return false;
-    
+
     try {
       await _state!._executeJs('window.editorAPI.disable()');
       return true;
@@ -927,7 +963,7 @@ class SummernoteController {
   /// Check if editor is empty
   Future<bool?> isEmpty() async {
     if (_state == null || _state!._state != EditorState.ready) return null;
-    
+
     try {
       final result = await _state!._executeJs('window.editorAPI.isEmpty()');
       return result == 'true';
@@ -939,12 +975,17 @@ class SummernoteController {
   /// Reset editor content
   Future<bool> reset() async {
     if (_state == null || _state!._state != EditorState.ready) return false;
-    
+
     try {
       await _state!._executeJs('window.editorAPI.reset()');
       return true;
     } catch (e) {
       return false;
     }
+  }
+
+  /// Dispose the controller and unbind from editor
+  void dispose() {
+    _unbind();
   }
 }

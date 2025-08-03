@@ -63,21 +63,39 @@ class _EditorHomePageState extends State<EditorHomePage>
     with TickerProviderStateMixin {
   late final TabController _tabController;
   final List<SummernoteController> _controllers = [];
+  final Set<int> _initializedTabs = {};
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
+    _tabController.addListener(_onTabChanged);
     
-    // Initialize controllers for different examples
+    // Initialize controllers for all tabs
     for (int i = 0; i < 4; i++) {
       _controllers.add(SummernoteController());
+    }
+    
+    // Mark first tab as initialized
+    _initializedTabs.add(0);
+  }
+  
+  void _onTabChanged() {
+    final currentIndex = _tabController.index;
+    if (!_initializedTabs.contains(currentIndex)) {
+      setState(() {
+        _initializedTabs.add(currentIndex);
+      });
     }
   }
 
   @override
   void dispose() {
+    _tabController.removeListener(_onTabChanged);
     _tabController.dispose();
+    for (final controller in _controllers) {
+      controller.dispose();
+    }
     super.dispose();
   }
 
@@ -99,7 +117,6 @@ class _EditorHomePageState extends State<EditorHomePage>
         ],
         bottom: TabBar(
           controller: _tabController,
-          onTap: (index) => {}, // Tab selection handled by TabController
           tabs: const [
             Tab(icon: Icon(Icons.edit), text: 'Basic'),
             Tab(icon: Icon(Icons.palette), text: 'Themed'),
@@ -111,13 +128,35 @@ class _EditorHomePageState extends State<EditorHomePage>
       body: TabBarView(
         controller: _tabController,
         children: [
-          _buildBasicExample(),
-          _buildThemedExample(),
-          _buildAdvancedExample(),
-          _buildApiDemoExample(),
+          _buildTabContent(0, _buildBasicExample),
+          _buildTabContent(1, _buildThemedExample),
+          _buildTabContent(2, _buildAdvancedExample),
+          _buildTabContent(3, _buildApiDemoExample),
         ],
       ),
     );
+  }
+  
+  Widget _buildTabContent(int tabIndex, Widget Function() builder) {
+    // Only build the editor if this tab has been initialized
+    if (!_initializedTabs.contains(tabIndex)) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Initializing editor...',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ],
+        ),
+      );
+    }
+    return builder();
   }
 
   Widget _buildBasicExample() {
@@ -139,48 +178,36 @@ class _EditorHomePageState extends State<EditorHomePage>
 
   Widget _buildThemedExample() {
     return _EditorExample(
-      title: 'Dark Theme Editor',
-      description: 'Beautiful dark theme with modern styling',
+      title: 'Themed Editor',
+      description: 'Editor with material theme styling',
       controller: _controllers[1],
       config: const EditorConfig(
-        placeholder: 'Experience the dark side of editing...',
+        placeholder: 'Experience themed editing...',
         debugMode: true,
         mode: EditorMode.online,
         enableWordCount: true,
-        enableCharacterCount: true,
+        autoFocus: false,
       ),
-      toolbarConfig: ToolbarConfigs.full,
-      theme: EditorThemes.dark,
+      toolbarConfig: ToolbarConfigs.basic,
+      theme: EditorThemes.light,
     );
   }
 
   Widget _buildAdvancedExample() {
     return _EditorExample(
       title: 'Advanced Configuration',
-      description: 'Full-featured editor with all available tools',
+      description: 'Full-featured editor with enhanced tools',
       controller: _controllers[2],
       config: const EditorConfig(
-        placeholder: 'Advanced editing with all features enabled...',
+        placeholder: 'Advanced editing with enhanced features...',
         debugMode: true,
         mode: EditorMode.online,
         enableWordCount: true,
         enableCharacterCount: true,
-        enableAutoResize: true,
-        maxLength: 5000,
-        initialContent: '''
-<h2>Welcome to Flutter Summernote 2.0! 🎉</h2>
-<p>This is a <strong>completely rewritten</strong> version with:</p>
-<ul>
-  <li>Modern Flutter architecture</li>
-  <li>Comprehensive error handling</li>
-  <li>Type-safe APIs</li>
-  <li>Excellent developer experience</li>
-</ul>
-<p>Try editing this content and explore all the features!</p>
-''',
+        autoFocus: false,
       ),
-      toolbarConfig: ToolbarConfigs.full,
-      theme: EditorThemes.material,
+      toolbarConfig: ToolbarConfigs.basic,
+      theme: EditorThemes.light,
     );
   }
 
@@ -545,8 +572,8 @@ class _ApiDemoExampleState extends State<_ApiDemoExample> {
                 debugMode: true,
                 mode: EditorMode.online,
               ),
-              toolbarConfig: ToolbarConfigs.full,
-              theme: EditorThemes.material,
+              toolbarConfig: ToolbarConfigs.basic,
+              theme: EditorThemes.light,
               onReady: () {
                 setState(() {
                   _isEditorReady = true;

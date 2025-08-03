@@ -103,17 +103,19 @@ class EditorTheme {
     buffer.writeln('.summernote-editor {');
     buffer.writeln('  background-color: ${_colorToCss(backgroundColor)};');
     buffer.writeln('  color: ${_colorToCss(textColor)};');
-    buffer.writeln('  border: ${borderWidth}px solid ${_colorToCss(borderColor)};');
+    buffer.writeln(
+      '  border: ${borderWidth}px solid ${_colorToCss(borderColor)};',
+    );
     buffer.writeln('  border-radius: ${borderRadius}px;');
     buffer.writeln('  font-family: $fontFamily;');
     buffer.writeln('  font-size: ${fontSize}px;');
     buffer.writeln('  line-height: $lineHeight;');
     buffer.writeln('  padding: ${_edgeInsetsToCSS(padding)};');
-    
+
     if (shadows != null && shadows!.isNotEmpty) {
       buffer.writeln('  box-shadow: ${_shadowsToCSS(shadows!)};');
     }
-    
+
     buffer.writeln('}');
 
     // Focus state
@@ -134,14 +136,20 @@ class EditorTheme {
 
     // Selection
     buffer.writeln('.summernote-editor ::selection {');
-    buffer.writeln('  background-color: ${_colorToCss(selectionColor.withOpacity(0.3))};');
+    buffer.writeln(
+      '  background-color: ${_colorToCss(selectionColor.withValues(alpha: 0.3))};',
+    );
     buffer.writeln('}');
 
     // Toolbar styles
     buffer.writeln('.note-toolbar {');
-    buffer.writeln('  background-color: ${_colorToCss(toolbarBackgroundColor)};');
+    buffer.writeln(
+      '  background-color: ${_colorToCss(toolbarBackgroundColor)};',
+    );
     buffer.writeln('  color: ${_colorToCss(toolbarTextColor)};');
-    buffer.writeln('  border-bottom: 1px solid ${_colorToCss(toolbarBorderColor)};');
+    buffer.writeln(
+      '  border-bottom: 1px solid ${_colorToCss(toolbarBorderColor)};',
+    );
     buffer.writeln('}');
 
     // Custom CSS
@@ -154,7 +162,7 @@ class EditorTheme {
 
   /// Convert Flutter Color to CSS color string
   String _colorToCss(Color color) {
-    return 'rgba(${color.red}, ${color.green}, ${color.blue}, ${color.opacity})';
+    return 'rgba(${(color.r * 255.0).round()}, ${(color.g * 255.0).round()}, ${(color.b * 255.0).round()}, ${color.a})';
   }
 
   /// Convert EdgeInsets to CSS padding
@@ -164,9 +172,11 @@ class EditorTheme {
 
   /// Convert BoxShadows to CSS box-shadow
   String _shadowsToCSS(List<BoxShadow> shadows) {
-    return shadows.map((shadow) {
-      return '${shadow.offset.dx}px ${shadow.offset.dy}px ${shadow.blurRadius}px ${_colorToCss(shadow.color)}';
-    }).join(', ');
+    return shadows
+        .map((shadow) {
+          return '${shadow.offset.dx}px ${shadow.offset.dy}px ${shadow.blurRadius}px ${_colorToCss(shadow.color)}';
+        })
+        .join(', ');
   }
 
   /// Create a copy with updated values
@@ -203,11 +213,13 @@ class EditorTheme {
       errorBorderColor: errorBorderColor ?? this.errorBorderColor,
       placeholderColor: placeholderColor ?? this.placeholderColor,
       selectionColor: selectionColor ?? this.selectionColor,
-      toolbarBackgroundColor: toolbarBackgroundColor ?? this.toolbarBackgroundColor,
+      toolbarBackgroundColor:
+          toolbarBackgroundColor ?? this.toolbarBackgroundColor,
       toolbarTextColor: toolbarTextColor ?? this.toolbarTextColor,
       toolbarBorderColor: toolbarBorderColor ?? this.toolbarBorderColor,
       loadingOverlayColor: loadingOverlayColor ?? this.loadingOverlayColor,
-      loadingIndicatorColor: loadingIndicatorColor ?? this.loadingIndicatorColor,
+      loadingIndicatorColor:
+          loadingIndicatorColor ?? this.loadingIndicatorColor,
       errorOverlayColor: errorOverlayColor ?? this.errorOverlayColor,
       fontFamily: fontFamily ?? this.fontFamily,
       fontSize: fontSize ?? this.fontSize,
@@ -219,7 +231,8 @@ class EditorTheme {
   }
 
   @override
-  String toString() => 'EditorTheme{backgroundColor: $backgroundColor, textColor: $textColor}';
+  String toString() =>
+      'EditorTheme{backgroundColor: $backgroundColor, textColor: $textColor}';
 }
 
 /// Predefined editor themes
@@ -250,11 +263,7 @@ class EditorThemes {
     borderRadius: 4.0,
     focusBorderColor: Colors.blue,
     shadows: [
-      BoxShadow(
-        color: Color(0x1F000000),
-        offset: Offset(0, 1),
-        blurRadius: 3,
-      ),
+      BoxShadow(color: Color(0x1F000000), offset: Offset(0, 1), blurRadius: 3),
     ],
   );
 
@@ -283,11 +292,7 @@ class EditorThemes {
     borderRadius: 12.0,
     padding: EdgeInsets.all(16.0),
     shadows: [
-      BoxShadow(
-        color: Color(0x0F000000),
-        offset: Offset(0, 2),
-        blurRadius: 8,
-      ),
+      BoxShadow(color: Color(0x0F000000), offset: Offset(0, 2), blurRadius: 8),
     ],
   );
 }

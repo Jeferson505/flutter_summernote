@@ -4,19 +4,19 @@
  * Event system for editor state changes, content updates, and user interactions
  */
 
+import 'dart:developer';
+
 import '../types/editor_types.dart';
 import '../errors/editor_exceptions.dart';
 
 /// Base class for all editor events
 abstract class EditorEvent {
-  const EditorEvent({
-    required this.timestamp,
-  });
+  const EditorEvent({required this.timestamp});
 
   final DateTime timestamp;
 
   @override
-  String toString() => '${runtimeType}{timestamp: $timestamp}';
+  String toString() => '$runtimeType{timestamp: $timestamp}';
 }
 
 /// Editor state changed event
@@ -31,7 +31,7 @@ class EditorStateChangedEvent extends EditorEvent {
   final EditorState currentState;
 
   @override
-  String toString() => 
+  String toString() =>
       'EditorStateChangedEvent{from: $previousState, to: $currentState, timestamp: $timestamp}';
 }
 
@@ -47,7 +47,7 @@ class EditorContentChangedEvent extends EditorEvent {
   final ContentChangeType changeType;
 
   @override
-  String toString() => 
+  String toString() =>
       'EditorContentChangedEvent{changeType: $changeType, isEmpty: ${content.isEmpty}, timestamp: $timestamp}';
 }
 
@@ -61,21 +61,18 @@ class EditorFocusChangedEvent extends EditorEvent {
   final FocusState focusState;
 
   @override
-  String toString() => 
+  String toString() =>
       'EditorFocusChangedEvent{focusState: $focusState, timestamp: $timestamp}';
 }
 
 /// Editor error event
 class EditorErrorEvent extends EditorEvent {
-  const EditorErrorEvent({
-    required this.exception,
-    required super.timestamp,
-  });
+  const EditorErrorEvent({required this.exception, required super.timestamp});
 
   final SummernoteException exception;
 
   @override
-  String toString() => 
+  String toString() =>
       'EditorErrorEvent{exception: $exception, timestamp: $timestamp}';
 }
 
@@ -89,21 +86,18 @@ class EditorReadyEvent extends EditorEvent {
   final Duration initializationTime;
 
   @override
-  String toString() => 
+  String toString() =>
       'EditorReadyEvent{initializationTime: ${initializationTime.inMilliseconds}ms, timestamp: $timestamp}';
 }
 
 /// Editor loading event
 class EditorLoadingEvent extends EditorEvent {
-  const EditorLoadingEvent({
-    required this.message,
-    required super.timestamp,
-  });
+  const EditorLoadingEvent({required this.message, required super.timestamp});
 
   final String message;
 
   @override
-  String toString() => 
+  String toString() =>
       'EditorLoadingEvent{message: $message, timestamp: $timestamp}';
 }
 
@@ -121,7 +115,7 @@ class EditorCommandEvent extends EditorEvent {
   final bool success;
 
   @override
-  String toString() => 
+  String toString() =>
       'EditorCommandEvent{command: $command, success: $success, timestamp: $timestamp}';
 }
 
@@ -139,7 +133,7 @@ class EditorAttachmentEvent extends EditorEvent {
   final String mimeType;
 
   @override
-  String toString() => 
+  String toString() =>
       'EditorAttachmentEvent{fileName: $fileName, fileSize: $fileSize, timestamp: $timestamp}';
 }
 
@@ -149,7 +143,7 @@ typedef EditorEventListener<T extends EditorEvent> = void Function(T event);
 /// Event bus for managing editor events
 class EditorEventBus {
   EditorEventBus._();
-  
+
   static final EditorEventBus _instance = EditorEventBus._();
   static EditorEventBus get instance => _instance;
 
@@ -181,7 +175,7 @@ class EditorEventBus {
           listener(event);
         } catch (e) {
           // Log error but don't break other listeners
-          print('Error in event listener: $e');
+          log('Error in event listener: $e');
         }
       }
     }

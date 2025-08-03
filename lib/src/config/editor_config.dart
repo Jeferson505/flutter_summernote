@@ -4,7 +4,6 @@
  * Comprehensive configuration system for the Summernote editor
  */
 
-import 'package:flutter/material.dart';
 import '../types/editor_types.dart';
 import '../events/editor_callbacks.dart';
 
@@ -158,27 +157,27 @@ class EditorConfig {
   /// Get validation errors
   List<String> get validationErrors {
     final errors = <String>[];
-    
+
     if (retryAttempts < 0) {
       errors.add('retryAttempts must be >= 0');
     }
-    
+
     if (timeout.inMilliseconds <= 0) {
       errors.add('timeout must be > 0');
     }
-    
+
     if (retryDelay.inMilliseconds < 0) {
       errors.add('retryDelay must be >= 0');
     }
-    
+
     if (maxLength != null && maxLength! <= 0) {
       errors.add('maxLength must be > 0 when specified');
     }
-    
+
     if (autoSaveInterval.inSeconds <= 0) {
       errors.add('autoSaveInterval must be > 0');
     }
-    
+
     return errors;
   }
 

@@ -4,7 +4,7 @@
  * Utility functions for content processing, validation, and helper methods
  */
 
-import 'dart:convert';
+import 'dart:developer';
 import 'dart:math' as math;
 import '../types/editor_types.dart';
 
@@ -15,24 +15,28 @@ class EditorUtils {
   /// Extract plain text from HTML content
   static String htmlToText(String html) {
     if (html.isEmpty) return '';
-    
+
     // Remove HTML tags using regex
-    final RegExp htmlTagRegex = RegExp(r'<[^>]*>', multiLine: true, caseSensitive: false);
+    final RegExp htmlTagRegex = RegExp(
+      r'<[^>]*>',
+      multiLine: true,
+      caseSensitive: false,
+    );
     String text = html.replaceAll(htmlTagRegex, '');
-    
+
     // Decode HTML entities
     text = _decodeHtmlEntities(text);
-    
+
     // Clean up whitespace
     text = text.replaceAll(RegExp(r'\s+'), ' ').trim();
-    
+
     return text;
   }
 
   /// Check if HTML content is empty (only contains empty tags or whitespace)
   static bool isHtmlEmpty(String html) {
     if (html.isEmpty) return true;
-    
+
     // Remove HTML tags and check if any meaningful content remains
     final text = htmlToText(html);
     return text.isEmpty;
@@ -41,19 +45,20 @@ class EditorUtils {
   /// Count words in text
   static int countWords(String text) {
     if (text.isEmpty) return 0;
-    
+
     // Split by whitespace and filter out empty strings
-    final words = text.split(RegExp(r'\s+'))
+    final words = text
+        .split(RegExp(r'\s+'))
         .where((word) => word.isNotEmpty)
         .toList();
-    
+
     return words.length;
   }
 
   /// Count characters in text (excluding whitespace)
   static int countCharacters(String text, {bool includeSpaces = true}) {
     if (text.isEmpty) return 0;
-    
+
     if (includeSpaces) {
       return text.length;
     } else {
@@ -89,15 +94,20 @@ class EditorUtils {
 
     // Remove dangerous tags
     for (final tag in dangerousTags) {
-      final regex = RegExp('<$tag[^>]*>.*?</$tag>', 
-          multiLine: true, caseSensitive: false);
+      final regex = RegExp(
+        '<$tag[^>]*>.*?</$tag>',
+        multiLine: true,
+        caseSensitive: false,
+      );
       sanitized = sanitized.replaceAll(regex, '');
     }
 
     // Remove dangerous attributes
     for (final attr in dangerousAttributes) {
-      final regex = RegExp('$attr\\s*=\\s*["\'][^"\']*["\']', 
-          caseSensitive: false);
+      final regex = RegExp(
+        '$attr\\s*=\\s*["\'][^"\']*["\']',
+        caseSensitive: false,
+      );
       sanitized = sanitized.replaceAll(regex, '');
     }
 
@@ -159,19 +169,21 @@ class EditorUtils {
 
   /// Create JavaScript function call
   static String createJsCall(String functionName, List<dynamic> args) {
-    final escapedArgs = args.map((arg) {
-      if (arg is String) {
-        return '"${escapeForJs(arg)}"';
-      } else if (arg is bool) {
-        return arg.toString();
-      } else if (arg is num) {
-        return arg.toString();
-      } else if (arg == null) {
-        return 'null';
-      } else {
-        return '"${escapeForJs(arg.toString())}"';
-      }
-    }).join(', ');
+    final escapedArgs = args
+        .map((arg) {
+          if (arg is String) {
+            return '"${escapeForJs(arg)}"';
+          } else if (arg is bool) {
+            return arg.toString();
+          } else if (arg is num) {
+            return arg.toString();
+          } else if (arg == null) {
+            return 'null';
+          } else {
+            return '"${escapeForJs(arg.toString())}"';
+          }
+        })
+        .join(', ');
 
     return '$functionName($escapedArgs);';
   }
@@ -199,11 +211,11 @@ class EditorUtils {
   /// Format file size in human-readable format
   static String formatFileSize(int bytes) {
     if (bytes <= 0) return '0 B';
-    
+
     const suffixes = ['B', 'KB', 'MB', 'GB', 'TB'];
     final i = (math.log(bytes) / math.log(1024)).floor();
     final size = bytes / math.pow(1024, i);
-    
+
     return '${size.toStringAsFixed(i == 0 ? 0 : 1)} ${suffixes[i]}';
   }
 
@@ -223,17 +235,22 @@ class EditorUtils {
       r'https?://[^\s<>"{}|\\^`\[\]]+',
       caseSensitive: false,
     );
-    
-    return urlRegex.allMatches(text)
+
+    return urlRegex
+        .allMatches(text)
         .map((match) => match.group(0) ?? '')
         .where((url) => url.isNotEmpty)
         .toList();
   }
 
   /// Truncate text to specified length
-  static String truncateText(String text, int maxLength, {String ellipsis = '...'}) {
+  static String truncateText(
+    String text,
+    int maxLength, {
+    String ellipsis = '...',
+  }) {
     if (text.length <= maxLength) return text;
-    
+
     final truncated = text.substring(0, maxLength - ellipsis.length);
     return '$truncated$ellipsis';
   }
@@ -241,7 +258,7 @@ class EditorUtils {
   /// Check if content exceeds maximum length
   static bool exceedsMaxLength(String content, int? maxLength) {
     if (maxLength == null) return false;
-    
+
     final text = htmlToText(content);
     return text.length > maxLength;
   }
@@ -250,7 +267,7 @@ class EditorUtils {
   static Map<String, dynamic> getContentStats(String html) {
     final text = htmlToText(html);
     final urls = extractUrls(text);
-    
+
     return {
       'htmlLength': html.length,
       'textLength': text.length,
@@ -268,14 +285,14 @@ class EditorUtils {
   static void debugContent(String html, {String? label}) {
     final stats = getContentStats(html);
     final prefix = label != null ? '[$label] ' : '';
-    
-    print('${prefix}Content Stats:');
-    print('  HTML Length: ${stats['htmlLength']}');
-    print('  Text Length: ${stats['textLength']}');
-    print('  Word Count: ${stats['wordCount']}');
-    print('  Character Count: ${stats['characterCount']}');
-    print('  Is Empty: ${stats['isEmpty']}');
-    print('  Is Valid HTML: ${stats['isValidHtml']}');
-    print('  URL Count: ${stats['urlCount']}');
+
+    log('${prefix}Content Stats:');
+    log('  HTML Length: ${stats['htmlLength']}');
+    log('  Text Length: ${stats['textLength']}');
+    log('  Word Count: ${stats['wordCount']}');
+    log('  Character Count: ${stats['characterCount']}');
+    log('  Is Empty: ${stats['isEmpty']}');
+    log('  Is Valid HTML: ${stats['isValidHtml']}');
+    log('  URL Count: ${stats['urlCount']}');
   }
 }

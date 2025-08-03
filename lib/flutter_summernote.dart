@@ -6,8 +6,6 @@
 * Built with clean architecture, comprehensive error handling, and modern Flutter patterns
 */
 
-library flutter_summernote;
-
 // Core Editor Widget
 export 'src/summernote_editor.dart';
 
