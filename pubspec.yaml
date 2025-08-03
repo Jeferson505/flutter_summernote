@@ -19,18 +19,18 @@ homepage: https://github.com/Jeferson505/flutter_summernote
 # on any other native host app that you embed your Flutter project into.
 
 environment:
-  sdk: ^3.7.2
+  sdk: ^3.8.1
 
 dependencies:
   flutter:
     sdk: flutter
-  webview_flutter: ^4.11.0
+  webview_flutter: ^4.13.0
   image_picker: ^1.1.2
   path: ^1.9.1
   mime: ^2.0.0
 
 dev_dependencies:
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -40,20 +40,6 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
-
-  assets:
-    - packages/flutter_summernote/src/editor_components/core/fonts/summernote.ttf
-    - packages/flutter_summernote/src/editor_components/core/fonts/summernote.eot
-    - packages/flutter_summernote/src/editor_components/core/fonts/summernote.woff
-    - packages/flutter_summernote/src/editor_components/core/fonts/summernote.woff2
-    - packages/flutter_summernote/src/editor_components/core/css/bootstrap.css
-    - packages/flutter_summernote/src/editor_components/core/css/summernote.css
-    - packages/flutter_summernote/src/editor_components/core/js/jquery.js
-    - packages/flutter_summernote/src/editor_components/core/js/popper.js
-    - packages/flutter_summernote/src/editor_components/core/js/bootstrap.js
-    - packages/flutter_summernote/src/editor_components/core/js/summernote.js
-    - packages/flutter_summernote/src/editor_components/core/summernote.html
-    - packages/flutter_summernote/src/editor_components/core/offline_summernote.html
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

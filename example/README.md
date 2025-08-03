@@ -1,4 +1,4 @@
-# example
+# flutter_summernote_example
 
 A new Flutter project.
 

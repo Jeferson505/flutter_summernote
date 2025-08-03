@@ -1,5 +1,5 @@
-name: example
-description: "A new Flutter project."
+name: flutter_summernote_example
+description: "Flutter Summernote 2.0 - Modern Rich Text Editor Example App"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.7.2
+  sdk: ^3.8.1
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -30,8 +30,17 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  
+  # Flutter Summernote 2.0 - Modern Rich Text Editor
   flutter_summernote:
     path: ../
+  
+  # Modern UI components
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
